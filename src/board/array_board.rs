@@ -1,7 +1,7 @@
 use std::ops::{Index, IndexMut};
 
-use crate::{basic::*, board::MutBoard};
-
+use crate::basic::*;
+use crate::board::{Board, MutBoard};
 
 /// MutBoard implementation using a 2D array of Option<Token>.
 /// An array of columns, where the 0th element is the bottom of the column.
@@ -24,7 +24,7 @@ impl IndexMut<(column::Idx, row::Idx)> for ArrayBoard {
     }
 }
 
-impl MutBoard for ArrayBoard {
+impl Board for ArrayBoard {
     const EMPTY: Self = ArrayBoard {
         grid: [[None; row::COUNT]; column::COUNT],
     };
@@ -33,6 +33,25 @@ impl MutBoard for ArrayBoard {
         self[(*col, row::Idx::TOP)].is_none()
     }
 
+    fn get(&self, pos: &Position) -> Option<Token> {
+        self[(pos.col, pos.row)]
+    }
+
+    fn display(&self) {
+        for row in (row::ROWIDXS.iter()).rev() {
+            print!("|");
+            for col in column::COLIDXS.iter() {
+                match self[(*col, *row)] {
+                    Some(token) => print!("{}", token),
+                    None => print!(" "),
+                }
+            }
+            println!("|");
+        }
+    }
+}
+
+impl MutBoard for ArrayBoard {
     fn force_place(&mut self, col: &column::Idx, token: &Token) -> Position {
         for row in row::ROWIDXS.iter() {
             if self[(*col, *row)].is_none() {
@@ -48,22 +67,5 @@ impl MutBoard for ArrayBoard {
 
     fn unplace(&mut self, pos: &Position) {
         self[(pos.col, pos.row)] = None;
-    }
-
-    fn get_token_at(&self, pos: &Position) -> Option<Token> {
-        self[(pos.col, pos.row)]
-    }
-
-    fn display(&self) {
-        for row in (row::ROWIDXS.iter()).rev() {
-            print!("|");
-            for col in column::COLIDXS.iter() {
-                match self[(*col, *row)] {
-                    Some(token) => print!("{}", token),
-                    None => print!(" "),
-                }
-            }
-            println!("|");
-        }
     }
 }
