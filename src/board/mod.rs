@@ -4,16 +4,32 @@ use std::fmt::Debug;
 pub mod array_board;
 
 /// Trait containing common board functionality.
-pub trait Board: Debug + Clone {
+pub trait Board: Debug {
     /// An empty starting board.
     const EMPTY: Self;
+
+    /// Returns the token at the given position, or None if the position is empty.
+    fn get(&self, pos: &Position) -> Option<Token>;
 
     /// Returns true if a token can be placed in the given column.
     /// i.e. the column is not full.
     fn can_place(&self, col: &column::Idx) -> bool;
 
-    /// Returns the token at the given position, or None if the position is empty.
-    fn get(&self, pos: &Position) -> Option<Token>;
+    /// Places a token in the given column, modifying the board in place and
+    /// returning the position the token was placed. Does not check if the column is full.
+    /// Must be preceded by a call to `can_place`.
+    /// # Panics
+    fn force_place(&mut self, col: &column::Idx, token: &Token) -> Position;
+
+    /// Tries to place a token in the given column, checking `can_place` and then calling
+    /// `force_place`. Returns `Some(Position)` if successful, `None` if the column is full.
+    fn try_place(&mut self, col: &column::Idx, token: &Token) -> Option<Position> {
+        if self.can_place(col) {
+            Some(self.force_place(col, token))
+        } else {
+            None
+        }
+    }
 
     /// Checks there is a win, a sequence of four same-colour tokens that includes the given
     /// position. The winning player is given by the colour of the token at the position.
@@ -47,47 +63,33 @@ pub trait Board: Debug + Clone {
     fn display(&self);
 }
 
-/// Trait for board implementations that don't have a cheap copy operation
-/// and instead place and unplace tokens on the same board.
-pub trait MutBoard: Board {
-    /// Tries to place a token in the given column, checking `can_place` and then calling
-    /// `force_place`. Returns `Some(Position)` if successful, `None` if the column is full.
-    fn try_place(&mut self, col: &column::Idx, token: &Token) -> Option<Position> {
+/// Trait for board implementations that have a cheap clone operation.
+/// Must opt-in to this trait.
+pub trait CloneBoard: Board + Clone {
+    /// Clones the given board and calls `try_place` with the given column,
+    /// returning the new board and position if successful.
+    fn clone_and_place(&self, col: &column::Idx, token: &Token) -> Option<(Self, Position)> {
         if self.can_place(col) {
-            Some(self.force_place(col, token))
+            let mut new_board = self.clone();
+            let pos = new_board.force_place(col, token);
+            Some((new_board, pos))
         } else {
             None
         }
     }
 
-    /// Places a token in the given column, modifying the board in place and
-    /// returning the position the token was placed. Does not check if the column is full.
-    /// Must be preceded by a call to `can_place`.
-    /// # Panics
-    fn force_place(&mut self, col: &column::Idx, token: &Token) -> Position;
-
-    /// Removes a token from the given position, modifying the board in place.
-    fn unplace(&mut self, pos: &Position);
+    /// Returns an iterator over every possible subsequent board state
+    /// after placing the given token in each non-full column.
+    fn next_boards(&self, token: &Token) -> impl Iterator<Item = (Self, Position)> {
+        column::IDXS.filter_map(move |col| self.clone_and_place(&col, token))
+    }
 }
 
-/// Trait for board implementations that have a cheap copy operation
-/// and create new boards when placing tokens.
-pub trait CopyBoard: Board + Copy {
-    /// Tries to place a token in the given column, checking `can_place` and then calling
-    /// `force_place`. Returns `Some((Self, Position))` if successful, `None` if the column is full.
-    fn try_place(&self, col: &column::Idx, token: &Token) -> Option<(Self, Position)> {
-        if self.can_place(col) {
-            Some(self.force_place(col, token))
-        } else {
-            None
-        }
-    }
-
-    /// Returns a new board with the token placed in the given column and
-    /// the position the token was placed. Does not check if the column is full.
-    /// Must be preceded by a call to `can_place`.
-    /// # Panics
-    fn force_place(&self, col: &column::Idx, token: &Token) -> (Self, Position);
+/// Trait for board implementations that don't have a cheap clone operation
+/// and instead place and unplace tokens on the same board.
+pub trait MutBoard: Board {
+    /// Removes a token from the given position, modifying the board in place.
+    fn unplace(&mut self, pos: &Position);
 }
 
 fn check_line<T: Iterator<Item = Option<Token>>>(line: T, token: &Token) -> bool {
@@ -103,4 +105,30 @@ fn check_line<T: Iterator<Item = Option<Token>>>(line: T, token: &Token) -> bool
         }
     }
     false
+}
+
+#[cfg(test)]
+mod mut_board_tests {
+    use super::*;
+    use crate::basic::{column, row};
+    use crate::board::array_board::ArrayBoard;
+
+    #[test]
+    fn test() {
+        won_at_horizontal::<ArrayBoard>();
+    }
+
+    fn won_at_horizontal<B: MutBoard>() {
+        let mut board = B::EMPTY;
+
+        for col in column::Idx::ZERO..=column::Idx::try_from(3).unwrap() {
+            board.force_place(&col, &Token::Red);
+        }
+
+        let pos = Position {
+            col: column::Idx::try_from(3).unwrap(),
+            row: row::Idx::try_from(0).unwrap(),
+        };
+        assert!(board.won_at(&pos));
+    }
 }
