@@ -1,5 +1,5 @@
 use crate::basic::*;
-use crate::board::{Board, MutBoard, CloneBoard};
+use crate::board::{Board, CloneBoard, MutBoard};
 
 pub fn minimax_mut<B: MutBoard>(board: &mut B, depth: usize, curr: Token) -> Option<Token> {
     if depth == 0 {
@@ -53,3 +53,4 @@ pub fn minimax_copy<B: CloneBoard>(board: B, depth: usize, curr: Token) -> Optio
 
     if losing { Some(curr.next()) } else { None }
 }
+

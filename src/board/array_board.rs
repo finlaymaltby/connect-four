@@ -49,20 +49,6 @@ impl Board for ArrayBoard {
         }
         panic!("Must check `can_place` before calling `force_place`");
     }
-
-    fn display(&self) {
-        for row in row::IDXS.rev() {
-            print!("|");
-            for col in column::IDXS {
-                match self[(col, row)] {
-                    Some(token) => print!("{}", token),
-                    None => print!(" "),
-                }
-            }
-            println!("|");
-        }
-        println!("+-------+");
-    }
 }
 
 impl CloneBoard for ArrayBoard {}

@@ -10,6 +10,12 @@ impl<const N: usize> FiniteIndex<N> {
     pub const MAX: FiniteIndex<N> = FiniteIndex(N);
     pub const COUNT: usize = N + 1;
 
+
+    /// Creates a FiniteIndex from a raw usize value without checking bounds.
+    pub const fn raw(value: usize) -> Self {
+        FiniteIndex(value)
+    }
+
     /// Shifts the value by the given amount,
     /// staying within bounds by capping/saturating at the edges.
     pub fn shift(&self, by: isize) -> Self {
@@ -36,13 +42,13 @@ impl<const N: usize> From<FiniteIndex<N>> for usize {
 }
 
 impl<const N: usize> TryFrom<usize> for FiniteIndex<N> {
-    type Error = &'static str;
+    type Error = String;
 
     fn try_from(value: usize) -> Result<Self, Self::Error> {
-        if value < N {
+        if value <= N {
             Ok(FiniteIndex(value))
         } else {
-            Err("FiniteIndex out of bounds")
+            Err(format!("FiniteIndex out of bounds error: {} >= {}", value, N))
         }
     }
 }

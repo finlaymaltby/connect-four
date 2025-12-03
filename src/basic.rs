@@ -42,6 +42,15 @@ pub mod column {
     pub type Idx = super::FiniteIndex<6>;
 
     pub const IDXS: RangeInclusive<Idx> = Idx::ZERO..=Idx::MAX;
+    pub const IDXS_CENTRED_FIRST: [Idx; COUNT] = [
+        Idx::raw(3),
+        Idx::raw(2),
+        Idx::raw(4),
+        Idx::raw(1),
+        Idx::raw(5),
+        Idx::raw(0),
+        Idx::raw(6),
+    ];
 }
 
 pub mod row {

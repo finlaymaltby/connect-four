@@ -1,7 +1,8 @@
-use crate::basic::{Position, Token, column};
+use crate::basic::{Position, Token, column, row};
 use std::fmt::Debug;
 
 pub mod array_board;
+pub mod moves_board;
 
 /// Trait containing common board functionality.
 pub trait Board: Debug {
@@ -60,7 +61,21 @@ pub trait Board: Debug {
     }
 
     /// Pretty displays the board to stdout.
-    fn display(&self);
+    fn display(&self) {
+        for row in row::IDXS.rev() {
+            print!("|");
+            for col in column::IDXS {
+                let pos = Position { col, row };
+                match self.get(&pos) {
+                    Some(Token::Red) => print!("R"),
+                    Some(Token::Yellow) => print!("Y"),
+                    None => print!(" "),
+                }
+            }
+            println!("|");
+        }
+        println!("+--------+");
+    }
 }
 
 /// Trait for board implementations that have a cheap clone operation.
@@ -89,7 +104,19 @@ pub trait CloneBoard: Board + Clone {
 /// and instead place and unplace tokens on the same board.
 pub trait MutBoard: Board {
     /// Removes a token from the given position, modifying the board in place.
+    /// Does not check that there is a token at the position.
     fn unplace(&mut self, pos: &Position);
+
+    /// Removes a token from the given position, modifying the board in place.
+    /// Checks that there is a token at the position before unplacing.
+    /// # Panics
+    fn unplace_checked(&mut self, pos: &Position) {
+        if self.get(pos).is_some() {
+            self.unplace(pos);
+        } else {
+            panic!("Tried to unplace from an empty position: {:?}", pos);
+        }
+    }
 }
 
 fn check_line<T: Iterator<Item = Option<Token>>>(line: T, token: &Token) -> bool {
