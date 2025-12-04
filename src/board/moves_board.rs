@@ -35,7 +35,7 @@ impl Board for MovesBoard {
         self.count_in_column(col) < row::COUNT
     }
 
-    fn force_place(&mut self, col: &column::Idx, token: &Token) -> Position {
+    fn place_unchecked(&mut self, col: &column::Idx, token: &Token) -> Position {
         let row = self.count_in_column(col);
         self.moves.push((*col, *token));
         Position {
@@ -48,17 +48,13 @@ impl Board for MovesBoard {
 impl CloneBoard for MovesBoard {}
 
 impl MutBoard for MovesBoard {
-    fn unplace(&mut self, pos: &Position) {
-        let mut col_count = 0;
-        for i in 0..self.moves.len() {
-            let (col, _) = &self.moves[i];
-            if *col == pos.col {
-                if col_count == usize::from(pos.row) {
-                    self.moves.remove(i);
-                    return;
-                }
-                col_count += 1;
+    fn unplace_unchecked(&mut self, col: &column::Idx) {
+        for i in (0..self.moves.len()).rev() {
+            if self.moves[i].0 == *col {
+                self.moves.remove(i);
+                return;
             }
         }
+        panic!("Tried to unplace from an empty column: {:?}", col);
     }
 }

@@ -2,10 +2,12 @@ use crate::basic::{Position, Token, column, row};
 use std::fmt::Debug;
 
 pub mod array_board;
+pub mod bit_board;
+pub mod count_bit_board;
 pub mod moves_board;
 
 /// Trait containing common board functionality.
-pub trait Board: Debug {
+pub trait Board: Debug + Sized {
     /// An empty starting board.
     const EMPTY: Self;
 
@@ -19,14 +21,13 @@ pub trait Board: Debug {
     /// Places a token in the given column, modifying the board in place and
     /// returning the position the token was placed. Does not check if the column is full.
     /// Must be preceded by a call to `can_place`.
-    /// # Panics
-    fn force_place(&mut self, col: &column::Idx, token: &Token) -> Position;
+    fn place_unchecked(&mut self, col: &column::Idx, token: &Token) -> Position;
 
     /// Tries to place a token in the given column, checking `can_place` and then calling
     /// `force_place`. Returns `Some(Position)` if successful, `None` if the column is full.
     fn try_place(&mut self, col: &column::Idx, token: &Token) -> Option<Position> {
         if self.can_place(col) {
-            Some(self.force_place(col, token))
+            Some(self.place_unchecked(col, token))
         } else {
             None
         }
@@ -76,6 +77,24 @@ pub trait Board: Debug {
         }
         println!("+--------+");
     }
+
+    /// Read a board from a string representation.
+    fn read(string: &str) -> Self {
+        let mut board = Self::EMPTY;
+
+        for line in string.lines().rev() {
+            for (j, c) in line.chars().enumerate() {
+                let token = match c {
+                    'R' => Token::Red,
+                    'Y' => Token::Yellow,
+                    _ => continue,
+                };
+
+                board.place_unchecked(&column::Idx::try_from(j).unwrap(), &token);
+            }
+        }
+        board
+    }
 }
 
 /// Trait for board implementations that have a cheap clone operation.
@@ -86,7 +105,7 @@ pub trait CloneBoard: Board + Clone {
     fn clone_and_place(&self, col: &column::Idx, token: &Token) -> Option<(Self, Position)> {
         if self.can_place(col) {
             let mut new_board = self.clone();
-            let pos = new_board.force_place(col, token);
+            let pos = new_board.place_unchecked(col, token);
             Some((new_board, pos))
         } else {
             None
@@ -103,18 +122,25 @@ pub trait CloneBoard: Board + Clone {
 /// Trait for board implementations that don't have a cheap clone operation
 /// and instead place and unplace tokens on the same board.
 pub trait MutBoard: Board {
-    /// Removes a token from the given position, modifying the board in place.
-    /// Does not check that there is a token at the position.
-    fn unplace(&mut self, pos: &Position);
+    /// Removes the top token from the given column, modifying the board in place.
+    /// Does not check if there is a token at the position.
+    fn unplace_unchecked(&mut self, col: &column::Idx);
 
-    /// Removes a token from the given position, modifying the board in place.
+    /// Removes the top token from the given column, modifying the board in place.
     /// Checks that there is a token at the position before unplacing.
-    /// # Panics
-    fn unplace_checked(&mut self, pos: &Position) {
-        if self.get(pos).is_some() {
-            self.unplace(pos);
+    /// Panics if there is no token at the position.
+    fn force_unplace(&mut self, col: &column::Idx) {
+        // if there is a token at the bottom of the column, there must be one to unplace
+        if self
+            .get(&Position {
+                col: *col,
+                row: row::Idx::BOTTOM,
+            })
+            .is_some()
+        {
+            self.unplace_unchecked(col);
         } else {
-            panic!("Tried to unplace from an empty position: {:?}", pos);
+            panic!("Tried to unplace from an empty column: {:?}", col);
         }
     }
 }
@@ -149,7 +175,7 @@ mod mut_board_tests {
         let mut board = B::EMPTY;
 
         for col in column::Idx::ZERO..=column::Idx::try_from(3).unwrap() {
-            board.force_place(&col, &Token::Red);
+            board.place_unchecked(&col, &Token::Red);
         }
 
         let pos = Position {

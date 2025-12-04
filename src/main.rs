@@ -1,12 +1,12 @@
 #![feature(step_trait, new_range_api)]
-
-use crate::basic::*;
-use crate::board::array_board::ArrayBoard;
-use crate::board::moves_board::MovesBoard;
-use crate::board::*;
-
 use crate::algorithms::minimax_basic::{minimax_copy, minimax_mut};
-use crate::algorithms::minimax_sneaky::minimax_sneaky;
+use crate::algorithms::minimax_sneaky::{minimax_sneaky_copy, minimax_sneaky_mut};
+#[allow(unused)]
+use crate::basic::*;
+use crate::board::Board;
+use crate::board::array_board::ArrayBoard;
+use crate::board::bit_board::BitBoard;
+use crate::board::count_bit_board::CountBitBoard;
 use std::time::Instant;
 
 mod algorithms;
@@ -17,41 +17,73 @@ mod finite_index;
 fn main() {
     let depth = 8;
 
-    let start_mut = Instant::now();
-    let t1 = minimax_mut(&mut MovesBoard::EMPTY, depth, Token::START);
-    let duration_mut = start_mut.elapsed();
+    let board_str = ".......\n.......\n.......\n...R...\n...Y...\n..RYYR.\n";
 
-    let start_copy = Instant::now();
-    let t2 = minimax_copy(MovesBoard::EMPTY, depth, Token::START);
-    let duration_copy = start_copy.elapsed();
+    let mut results = Vec::new();
 
+    // ArrayBoard with minimax_copy
+    let board = ArrayBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_copy(&board, depth, Token::START));
+    results.push(("ArrayBoard + minimax_copy", start.elapsed()));
 
-    let start_mut_a = Instant::now();
-    let a1 = minimax_mut(&mut ArrayBoard::EMPTY, depth, Token::START);
-    let duration_mut_a = start_mut_a.elapsed();
+    // ArrayBoard with minimax_mut
+    let mut board = ArrayBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_mut(&mut board, depth, Token::START));
+    results.push(("ArrayBoard + minimax_mut", start.elapsed()));
 
-    let start_copy_a = Instant::now();
-    let a2 = minimax_copy(ArrayBoard::EMPTY, depth, Token::START);
-    let duration_copy_a = start_copy_a.elapsed();
+    // BitBoard with minimax_copy
+    let board = BitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_copy(&board, depth, Token::START));
+    results.push(("BitBoard + minimax_copy", start.elapsed()));
 
-    assert_eq!(a1, a2, "minimax_mut and minimax_copy produced different results for ArrayBoard");
+    // BitBoard with minimax_mut
+    let mut board = BitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_mut(&mut board, depth, Token::START));
+    results.push(("BitBoard + minimax_mut", start.elapsed()));
 
-    // test minimax_sneaky for MovesBoard (use a fresh board to avoid moves/consumption issues)
-    let start_sneaky = Instant::now();
-    let s1 = minimax_sneaky(MovesBoard::EMPTY, depth, Token::START);
-    let duration_sneaky = start_sneaky.elapsed();
-    assert_eq!(s1, t1, "minimax_sneaky produced a different result for MovesBoard");
+    // BitBoard with minimax_sneaky_copy
+    let board = BitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_sneaky_copy(&board, depth, Token::START));
+    results.push(("BitBoard + minimax_sneaky_copy", start.elapsed()));
 
-    // test minimax_sneaky for ArrayBoard (fresh board)
-    let start_sneaky_a = Instant::now();
-    let sa1 = minimax_sneaky(ArrayBoard::EMPTY, depth, Token::START);
-    let duration_sneaky_a = start_sneaky_a.elapsed();
-    assert_eq!(sa1, a1, "minimax_sneaky produced a different result for ArrayBoard");
+    // BitBoard with minimax_sneaky_mut
+    let mut board = BitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_sneaky_mut(&mut board, depth, Token::START));
+    results.push(("BitBoard + minimax_sneaky_mut", start.elapsed()));
 
-    println!("Time taken by minimax_mut (MovesBoard): {:?}", duration_mut);
-    println!("Time taken by minimax_copy (MovesBoard): {:?}", duration_copy);
-    println!("Time taken by minimax_sneaky (MovesBoard): {:?}", duration_sneaky);
-    println!("Time taken by minimax_mut (ArrayBoard): {:?}", duration_mut_a);
-    println!("Time taken by minimax_copy (ArrayBoard): {:?}", duration_copy_a);
-    println!("Time taken by minimax_sneaky (ArrayBoard): {:?}", duration_sneaky_a);
+    // CountBitBoard with minimax_copy
+    let board = CountBitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_copy(&board, depth, Token::START));
+    results.push(("CountBitBoard + minimax_copy", start.elapsed()));
+
+    // CountBitBoard with minimax_mut
+    let mut board = CountBitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_mut(&mut board, depth, Token::START));
+    results.push(("CountBitBoard + minimax_mut", start.elapsed()));
+
+    // CountBitBoard with minimax_sneaky_copy
+    let board = CountBitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_sneaky_copy(&board, depth, Token::START));
+    results.push(("CountBitBoard + minimax_sneaky_copy", start.elapsed()));
+
+    // CountBitBoard with minimax_sneaky_mut
+    let mut board = CountBitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_sneaky_mut(&mut board, depth, Token::START));
+    results.push(("CountBitBoard + minimax_sneaky_mut", start.elapsed()));
+
+    println!("\n{:<30} {:>15}", "Configuration", "Time (ms)");
+    println!("{:-<47}", "");
+    for (name, duration) in results {
+        println!("{:<30} {:>15.2}", name, duration.as_secs_f64() * 1000.0);
+    }
 }

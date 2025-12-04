@@ -37,7 +37,7 @@ impl Board for ArrayBoard {
         self[(pos.col, pos.row)]
     }
 
-    fn force_place(&mut self, col: &column::Idx, token: &Token) -> Position {
+    fn place_unchecked(&mut self, col: &column::Idx, token: &Token) -> Position {
         for row in row::IDXS {
             if self[(*col, row)].is_none() {
                 self[(*col, row)] = Some(*token);
@@ -54,7 +54,13 @@ impl Board for ArrayBoard {
 impl CloneBoard for ArrayBoard {}
 
 impl MutBoard for ArrayBoard {
-    fn unplace(&mut self, pos: &Position) {
-        self[(pos.col, pos.row)] = None;
+    fn unplace_unchecked(&mut self, col: &column::Idx) {
+        for row in (row::Idx::ZERO..=row::Idx::TOP).rev() {
+            if self[(*col, row)].is_some() {
+                self[(*col, row)] = None;
+                return;
+            }
+        }
+        panic!("Tried to unplace from an empty column: {:?}", col);
     }
 }

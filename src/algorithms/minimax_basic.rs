@@ -1,5 +1,5 @@
 use crate::basic::*;
-use crate::board::{Board, CloneBoard, MutBoard};
+use crate::board::{CloneBoard, MutBoard};
 
 pub fn minimax_mut<B: MutBoard>(board: &mut B, depth: usize, curr: Token) -> Option<Token> {
     if depth == 0 {
@@ -11,26 +11,26 @@ pub fn minimax_mut<B: MutBoard>(board: &mut B, depth: usize, curr: Token) -> Opt
     for col in column::IDXS {
         if let Some(pos) = board.try_place(&col, &curr) {
             if board.won_at(&pos) {
-                board.unplace(&pos);
+                board.force_unplace(&pos.col);
                 return Some(curr);
             }
 
             if let Some(winner) = minimax_mut(board, depth - 1, curr.next()) {
                 if winner == curr {
-                    board.unplace(&pos);
+                    board.force_unplace(&pos.col);
                     return Some(curr);
                 }
             } else {
                 losing = false;
             }
-            board.unplace(&pos);
+            board.force_unplace(&pos.col);
         }
     }
 
     if losing { Some(curr.next()) } else { None }
 }
 
-pub fn minimax_copy<B: CloneBoard>(board: B, depth: usize, curr: Token) -> Option<Token> {
+pub fn minimax_copy<B: CloneBoard>(board: &B, depth: usize, curr: Token) -> Option<Token> {
     if depth == 0 {
         return None;
     }
@@ -42,7 +42,7 @@ pub fn minimax_copy<B: CloneBoard>(board: B, depth: usize, curr: Token) -> Optio
             return Some(curr);
         }
 
-        if let Some(winner) = minimax_copy(next_board, depth - 1, curr.next()) {
+        if let Some(winner) = minimax_copy(&next_board, depth - 1, curr.next()) {
             if winner == curr {
                 return Some(curr);
             }
@@ -53,4 +53,3 @@ pub fn minimax_copy<B: CloneBoard>(board: B, depth: usize, curr: Token) -> Optio
 
     if losing { Some(curr.next()) } else { None }
 }
-
