@@ -5,7 +5,7 @@ use crate::board::{Board, CloneBoard, MutBoard};
 
 /// MutBoard implementation using a 2D array of Option<Token>.
 /// An array of columns, where the 0th element is the bottom of the column.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ArrayBoard {
     grid: [[Option<Token>; row::COUNT]; column::COUNT],
 }

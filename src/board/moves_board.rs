@@ -4,7 +4,7 @@ use crate::board::{Board, CloneBoard, MutBoard};
 /// MovesBoard implementation using a vector of placed tokens.
 /// Stores only the moves made, reconstructing the board state as needed.
 /// The worst representation I could think of.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MovesBoard {
     moves: Vec<(column::Idx, Token)>,
 }

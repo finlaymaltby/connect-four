@@ -6,7 +6,7 @@ use std::ops::RangeInclusive;
 
 /// A Token in the game, either Yellow or Red.
 /// (Yellow starts)
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
 pub enum Token {
     Yellow,
     Red,

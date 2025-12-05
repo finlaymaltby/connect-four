@@ -7,7 +7,7 @@ pub mod count_bit_board;
 pub mod moves_board;
 
 /// Trait containing common board functionality.
-pub trait Board: Debug + Sized {
+pub trait Board: Debug + Sized + Eq{
     /// An empty starting board.
     const EMPTY: Self;
 
@@ -18,14 +18,14 @@ pub trait Board: Debug + Sized {
     /// i.e. the column is not full.
     fn can_place(&self, col: &column::Idx) -> bool;
 
-    /// Places a token in the given column, modifying the board in place and
+    /// Places the given token in the given column, modifying the board in place and
     /// returning the position the token was placed. Does not check if the column is full.
     /// Must be preceded by a call to `can_place`.
     fn place_unchecked(&mut self, col: &column::Idx, token: &Token) -> Position;
 
     /// Tries to place a token in the given column, checking `can_place` and then calling
     /// `force_place`. Returns `Some(Position)` if successful, `None` if the column is full.
-    fn try_place(&mut self, col: &column::Idx, token: &Token) -> Option<Position> {
+    fn place(&mut self, col: &column::Idx, token: &Token) -> Option<Position> {
         if self.can_place(col) {
             Some(self.place_unchecked(col, token))
         } else {
@@ -82,17 +82,22 @@ pub trait Board: Debug + Sized {
     fn read(string: &str) -> Self {
         let mut board = Self::EMPTY;
 
-        for line in string.lines().rev() {
-            for (j, c) in line.chars().enumerate() {
-                let token = match c {
+        for line in string.split('|').rev() {
+            if line.trim().is_empty() {
+                continue;
+            }
+            for (i, ch) in line.chars().enumerate() {
+                let token = match ch {
                     'R' => Token::Red,
                     'Y' => Token::Yellow,
-                    _ => continue,
+                    '.' | ' ' => continue,
+                    '+' | '-' => return board, // end of board representation
+                    _ => panic!("Invalid character in board string: {}", ch),
                 };
-
-                board.place_unchecked(&column::Idx::try_from(j).unwrap(), &token);
+                board.place_unchecked(&column::Idx::try_from(i).unwrap(), &token);
             }
         }
+        
         board
     }
 }
@@ -115,7 +120,8 @@ pub trait CloneBoard: Board + Clone {
     /// Returns an iterator over every possible subsequent board state
     /// after placing the given token in each non-full column.
     fn next_boards(&self, token: &Token) -> impl Iterator<Item = (Self, Position)> {
-        column::IDXS.filter_map(move |col| self.clone_and_place(&col, token))
+        // a simple optimisation to try the centre columns first
+        column::IDXS_CENTRED_FIRST.iter().filter_map(move |col| self.clone_and_place(&col, token))
     }
 }
 

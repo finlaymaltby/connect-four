@@ -19,7 +19,7 @@ mod bit_col {
     use super::*;
 
     /// A column of the CountBoard, stored as a u8.
-    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
     pub struct CountBitCol {
         col: u8,
         count: usize,
@@ -82,7 +82,7 @@ mod bit_col {
 
 /// A board implementation using bit manipulation for storage.
 /// Each column is stored as a BitCol.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct CountBitBoard {
     cols: [bit_col::CountBitCol; column::COUNT],
 }

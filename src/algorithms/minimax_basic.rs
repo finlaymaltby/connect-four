@@ -9,7 +9,7 @@ pub fn minimax_mut<B: MutBoard>(board: &mut B, depth: usize, curr: Token) -> Opt
     let mut losing = true;
 
     for col in column::IDXS {
-        if let Some(pos) = board.try_place(&col, &curr) {
+        if let Some(pos) = board.place(&col, &curr) {
             if board.won_at(&pos) {
                 board.force_unplace(&pos.col);
                 return Some(curr);
@@ -30,7 +30,7 @@ pub fn minimax_mut<B: MutBoard>(board: &mut B, depth: usize, curr: Token) -> Opt
     if losing { Some(curr.next()) } else { None }
 }
 
-pub fn minimax_copy<B: CloneBoard>(board: &B, depth: usize, curr: Token) -> Option<Token> {
+pub fn minimax_copy<B: CloneBoard>(board: B, depth: usize, curr: Token) -> Option<Token> {
     if depth == 0 {
         return None;
     }
@@ -42,7 +42,7 @@ pub fn minimax_copy<B: CloneBoard>(board: &B, depth: usize, curr: Token) -> Opti
             return Some(curr);
         }
 
-        if let Some(winner) = minimax_copy(&next_board, depth - 1, curr.next()) {
+        if let Some(winner) = minimax_copy(next_board, depth - 1, curr.next()) {
             if winner == curr {
                 return Some(curr);
             }

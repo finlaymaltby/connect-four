@@ -24,7 +24,7 @@ mod bit_col {
     // Examples:
     // 0b01abcdef : col is full, a at bottom, f at top
     // 0b00000001 : col is empty
-    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
     pub struct BitCol(u8);
 
     impl BitCol {
@@ -81,7 +81,7 @@ mod bit_col {
 
 /// A board implementation using bit manipulation for storage.
 /// Each column is stored as a BitCol.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct BitBoard {
     cols: [bit_col::BitCol; column::COUNT],
 }
