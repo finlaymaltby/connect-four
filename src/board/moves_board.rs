@@ -35,26 +35,30 @@ impl Board for MovesBoard {
         self.count_in_column(col) < row::COUNT
     }
 
-    fn place_unchecked(&mut self, col: &column::Idx, token: &Token) -> Position {
+    fn place(&mut self, col: &column::Idx, token: &Token) -> Option<Position> {
         let row = self.count_in_column(col);
+        let row = row::Idx::try_from(row).ok()?;
         self.moves.push((*col, *token));
-        Position {
+        Some(Position {
             row: row::Idx::try_from(row).unwrap(),
             col: *col,
-        }
+        })
     }
 }
 
 impl CloneBoard for MovesBoard {}
 
 impl MutBoard for MovesBoard {
-    fn unplace_unchecked(&mut self, col: &column::Idx) {
-        for i in (0..self.moves.len()).rev() {
-            if self.moves[i].0 == *col {
-                self.moves.remove(i);
-                return;
+    fn unplace(&mut self, pos: &Position) {
+        let mut col_count = 0;
+        for (i, (col, token)) in self.moves.iter().enumerate() {
+            if *col == pos.col {
+                if col_count == usize::from(pos.row) {
+                    self.moves.remove(i);
+                    return;
+                }
+                col_count += 1;
             }
         }
-        panic!("Tried to unplace from an empty column: {:?}", col);
     }
 }

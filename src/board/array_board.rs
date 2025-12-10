@@ -10,17 +10,17 @@ pub struct ArrayBoard {
     grid: [[Option<Token>; row::COUNT]; column::COUNT],
 }
 
-impl Index<(column::Idx, row::Idx)> for ArrayBoard {
+impl Index<&Position> for ArrayBoard {
     type Output = Option<Token>;
 
-    fn index(&self, index: (column::Idx, row::Idx)) -> &Self::Output {
-        &self.grid[usize::from(index.0)][usize::from(index.1)]
+    fn index(&self, index: &Position) -> &Self::Output {
+        &self.grid[usize::from(index.col)][usize::from(index.row)]
     }
 }
 
-impl IndexMut<(column::Idx, row::Idx)> for ArrayBoard {
-    fn index_mut(&mut self, index: (column::Idx, row::Idx)) -> &mut Self::Output {
-        &mut self.grid[usize::from(index.0)][usize::from(index.1)]
+impl IndexMut<&Position> for ArrayBoard {
+    fn index_mut(&mut self, index: &Position) -> &mut Self::Output {
+        &mut self.grid[usize::from(index.col)][usize::from(index.row)]
     }
 }
 
@@ -30,37 +30,35 @@ impl Board for ArrayBoard {
     };
 
     fn can_place(&self, col: &column::Idx) -> bool {
-        self[(*col, row::Idx::TOP)].is_none()
+        self[&Position {
+            col: *col,
+            row: row::Idx::TOP,
+        }]
+            .is_none()
     }
 
     fn get(&self, pos: &Position) -> Option<Token> {
-        self[(pos.col, pos.row)]
+        self[pos]
     }
 
-    fn place_unchecked(&mut self, col: &column::Idx, token: &Token) -> Position {
+    fn place(&mut self, col: &column::Idx, token: &Token) -> Option<Position> {
         for row in row::IDXS {
-            if self[(*col, row)].is_none() {
-                self[(*col, row)] = Some(*token);
-                return Position {
+            if self[&Position { col: *col, row }].is_none() {
+                self[&Position { col: *col, row }] = Some(*token);
+                return Some(Position {
                     col: *col,
                     row: row,
-                };
+                });
             }
         }
-        panic!("Must check `can_place` before calling `force_place`");
+        None
     }
 }
 
 impl CloneBoard for ArrayBoard {}
 
 impl MutBoard for ArrayBoard {
-    fn unplace_unchecked(&mut self, col: &column::Idx) {
-        for row in (row::Idx::ZERO..=row::Idx::TOP).rev() {
-            if self[(*col, row)].is_some() {
-                self[(*col, row)] = None;
-                return;
-            }
-        }
-        panic!("Tried to unplace from an empty column: {:?}", col);
+    fn unplace(&mut self, pos: &Position) {
+        self[pos] = None;
     }
 }

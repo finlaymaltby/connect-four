@@ -11,19 +11,19 @@ pub fn minimax_mut<B: MutBoard>(board: &mut B, depth: usize, curr: Token) -> Opt
     for col in column::IDXS {
         if let Some(pos) = board.place(&col, &curr) {
             if board.won_at(&pos) {
-                board.force_unplace(&pos.col);
+                board.unplace(&pos);
                 return Some(curr);
             }
 
             if let Some(winner) = minimax_mut(board, depth - 1, curr.next()) {
                 if winner == curr {
-                    board.force_unplace(&pos.col);
+                    board.unplace(&pos);
                     return Some(curr);
                 }
             } else {
                 losing = false;
             }
-            board.force_unplace(&pos.col);
+            board.unplace(&pos);
         }
     }
 

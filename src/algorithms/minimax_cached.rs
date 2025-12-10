@@ -1,14 +1,19 @@
 use crate::basic::*;
 use crate::board::{Board, CloneBoard, MutBoard};
-use std::hash::{Hash, RandomState};
 use std::collections::HashMap;
+use std::hash::{Hash, RandomState};
 
 pub fn minimax_cached<B: CloneBoard + Hash>(board: B, depth: usize, curr: Token) -> Option<Token> {
     let mut cache = HashMap::new();
     minimax_cached_helper(board, depth, curr, &mut cache)
 }
 
-fn minimax_cached_helper<B: CloneBoard + Hash>(board: B, depth: usize, curr: Token, cache: &mut HashMap<B, Option<Token>, RandomState>) -> Option<Token> {
+fn minimax_cached_helper<B: CloneBoard + Hash>(
+    board: B,
+    depth: usize,
+    curr: Token,
+    cache: &mut HashMap<B, Option<Token>, RandomState>,
+) -> Option<Token> {
     if depth == 0 {
         cache.insert(board, None);
         return None;
@@ -38,10 +43,10 @@ fn minimax_cached_helper<B: CloneBoard + Hash>(board: B, depth: usize, curr: Tok
         }
     }
 
-    if out.is_none() && losing { 
+    if out.is_none() && losing {
         out = Some(curr.next());
-    } 
+    }
 
     cache.insert(board, out);
     out
-}   
+}

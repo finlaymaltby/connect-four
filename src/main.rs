@@ -6,7 +6,7 @@ use crate::basic::*;
 use crate::board::Board;
 use crate::board::array_board::ArrayBoard;
 use crate::board::bit_board::BitBoard;
-use crate::board::count_bit_board::CountBitBoard;
+use crate::board::symmetric_bit_board::SymmetricBitBoard;
 use std::time::Instant;
 
 mod algorithms;
@@ -50,18 +50,7 @@ fn main() {
     println!("{:?}", minimax_mut(&mut board, depth, Token::START));
     results.push(("BitBoard + minimax_mut", start.elapsed()));
 
-    // CountBitBoard with minimax_copy
-    let board = CountBitBoard::read(board_str);
-    let start = Instant::now();
-    println!("{:?}", minimax_copy(board, depth, Token::START));
-    results.push(("CountBitBoard + minimax_copy", start.elapsed()));
-
-    // CountBitBoard with minimax_mut
-    let mut board = CountBitBoard::read(board_str);
-    let start = Instant::now();
-    println!("{:?}", minimax_mut(&mut board, depth, Token::START));
-    results.push(("CountBitBoard + minimax_mut", start.elapsed()));
-
+    let depth2 = 10;
     // ArrayBoard with minimax_cached
     let board = ArrayBoard::read(board_str);
     let start = Instant::now();
@@ -71,14 +60,26 @@ fn main() {
     // BitBoard with minimax_cached
     let board = BitBoard::read(board_str);
     let start = Instant::now();
-    println!("{:?}", minimax_cached(board, depth, Token::START));
+    println!("{:?}", minimax_cached(board, depth2, Token::START));
     results.push(("BitBoard + minimax_cached", start.elapsed()));
 
-    // CountBitBoard with minimax_cached
-    let board = CountBitBoard::read(board_str);
+    // SymmetricBitBoard with minimax_copy
+    let board = SymmetricBitBoard::read(board_str);
     let start = Instant::now();
-    println!("{:?}", minimax_cached(board, depth, Token::START));
-    results.push(("CountBitBoard + minimax_cached", start.elapsed()));
+    println!("{:?}", minimax_copy(board, depth, Token::START));
+    results.push(("SymmetricBitBoard + minimax_copy", start.elapsed()));
+
+    // SymmetricBitBoard with minimax_mut
+    let mut board = SymmetricBitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_mut(&mut board, depth, Token::START));
+    results.push(("SymmetricBitBoard + minimax_mut", start.elapsed()));
+
+    // SymmetricBitBoard with minimax_cached
+    let board = SymmetricBitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_cached(board, depth2, Token::START));
+    results.push(("SymmetricBitBoard + minimax_cached", start.elapsed()));
 
     println!("\n{:<30} {:>15}", "Configuration", "Time (ms)");
     println!("{:-<47}", "");
