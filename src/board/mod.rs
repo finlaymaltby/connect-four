@@ -100,6 +100,8 @@ pub trait Board: Debug + Sized + Eq {
             if line.trim().is_empty() {
                 continue;
             }
+            debug_assert!(line.len() == 7);
+
             for (i, ch) in line.chars().enumerate() {
                 let token = match ch {
                     'R' => Token::Red,
@@ -108,7 +110,8 @@ pub trait Board: Debug + Sized + Eq {
                     '+' | '-' => return board, // end of board representation
                     _ => panic!("Invalid character in board string: {}", ch),
                 };
-                board.place(&column::Idx::try_from(i).unwrap(), &token);
+                let pos = board.place(&column::Idx::try_from(i).unwrap(), &token);
+                debug_assert!(pos.is_some());
             }
         }
 

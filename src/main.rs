@@ -13,6 +13,7 @@ mod algorithms;
 mod basic;
 mod board;
 mod finite_index;
+mod test_positions;
 
 fn main() {
     let depth = 8;
