@@ -6,11 +6,11 @@ use std::hash::Hash;
 /// customised equality and hashing for symmetry.
 /// Each column is stored as a BitCol.
 #[derive(Clone, Debug)]
-pub struct SymmetricBitBoard {
+pub struct SymmBoard {
     cols: [bit_col::BitCol; column::COUNT],
 }
-impl Board for SymmetricBitBoard {
-    const EMPTY: Self = SymmetricBitBoard {
+impl Board for SymmBoard {
+    const EMPTY: Self = SymmBoard {
         cols: [bit_col::BitCol::EMPTY; column::COUNT],
     };
 
@@ -36,15 +36,15 @@ impl Board for SymmetricBitBoard {
     }
 }
 
-impl CloneBoard for SymmetricBitBoard {}
+impl CloneBoard for SymmBoard {}
 
-impl MutBoard for SymmetricBitBoard {
+impl MutBoard for SymmBoard {
     fn unplace(&mut self, pos: &Position) {
         self.cols[usize::from(pos.col)].force_pop();
     }
 }
 
-impl PartialEq for SymmetricBitBoard {
+impl PartialEq for SymmBoard {
     fn eq(&self, other: &Self) -> bool {
         self.cols == other.cols
             || self
@@ -55,9 +55,9 @@ impl PartialEq for SymmetricBitBoard {
     }
 }
 
-impl Eq for SymmetricBitBoard {}
+impl Eq for SymmBoard {}
 
-impl Hash for SymmetricBitBoard {
+impl Hash for SymmBoard {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.cols[3].hash(state);
         for i in 0..3 {
@@ -71,8 +71,35 @@ impl Hash for SymmetricBitBoard {
 
 #[cfg(test)]
 mod tests {
+    use std::hash::DefaultHasher;
+    use std::hash::Hasher;
+
     use super::*;
 
-    make_board_tests!(SymmetricBitBoard);
-    make_mut_board_tests!(SymmetricBitBoard);
+    make_board_tests!(SymmBoard);
+    make_mut_board_tests!(SymmBoard);
+
+
+    #[test]
+    fn test_symmetry() {
+        let mut board_a = SymmBoard::EMPTY;
+        let mut board_b = SymmBoard::EMPTY;
+        let mut token = Token::START;
+        for _ in row::IDXS {
+            for col in column::IDXS {
+                board_a.place(&col, &token).unwrap();
+                assert_ne!(board_a, board_b, "Nonequivalent SymmBoards returned equal");
+            
+                board_b.place(&col.flip(), &token).unwrap();
+                
+                assert_eq!(board_a, board_b, "Symmetric SymmBoards are not equal");
+                let mut hasher_a = DefaultHasher::new();
+                let mut hasher_b = DefaultHasher::new();
+                board_a.hash(&mut hasher_a);
+                board_b.hash(&mut hasher_b);
+                assert_eq!(hasher_a.finish(), hasher_b.finish(), "Symmetric SymmBoards have different hashes");
+
+            }
+        }
+    }
 }

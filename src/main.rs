@@ -6,7 +6,7 @@ use crate::basic::*;
 use crate::board::Board;
 use crate::board::array_board::ArrayBoard;
 use crate::board::bit_board::BitBoard;
-use crate::board::symmetric_bit_board::SymmetricBitBoard;
+use crate::board::symm_board::SymmBoard;
 use std::time::Instant;
 
 mod algorithms;
@@ -65,19 +65,19 @@ fn main() {
     results.push(("BitBoard + minimax_cached", start.elapsed()));
 
     // SymmetricBitBoard with minimax_copy
-    let board = SymmetricBitBoard::read(board_str);
+    let board = SymmBoard::read(board_str);
     let start = Instant::now();
     println!("{:?}", minimax_copy(board, depth, Token::START));
     results.push(("SymmetricBitBoard + minimax_copy", start.elapsed()));
 
     // SymmetricBitBoard with minimax_mut
-    let mut board = SymmetricBitBoard::read(board_str);
+    let mut board = SymmBoard::read(board_str);
     let start = Instant::now();
     println!("{:?}", minimax_mut(&mut board, depth, Token::START));
     results.push(("SymmetricBitBoard + minimax_mut", start.elapsed()));
 
     // SymmetricBitBoard with minimax_cached
-    let board = SymmetricBitBoard::read(board_str);
+    let board = SymmBoard::read(board_str);
     let start = Instant::now();
     println!("{:?}", minimax_cached(board, depth2, Token::START));
     results.push(("SymmetricBitBoard + minimax_cached", start.elapsed()));
