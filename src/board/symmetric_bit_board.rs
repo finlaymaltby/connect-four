@@ -2,7 +2,7 @@ use crate::basic::*;
 use crate::board::{Board, CloneBoard, MutBoard, bit_col};
 use std::hash::Hash;
 
-/// A board implementation using bit manipulation for storage with 
+/// A board implementation using bit manipulation for storage with
 /// customised equality and hashing for symmetry.
 /// Each column is stored as a BitCol.
 #[derive(Clone, Debug)]
@@ -46,7 +46,12 @@ impl MutBoard for SymmetricBitBoard {
 
 impl PartialEq for SymmetricBitBoard {
     fn eq(&self, other: &Self) -> bool {
-        self.cols == other.cols || self.cols.iter().zip(other.cols.iter().rev()).all(|(a, b)| a == b)
+        self.cols == other.cols
+            || self
+                .cols
+                .iter()
+                .zip(other.cols.iter().rev())
+                .all(|(a, b)| a == b)
     }
 }
 
@@ -57,9 +62,17 @@ impl Hash for SymmetricBitBoard {
         self.cols[3].hash(state);
         for i in 0..3 {
             let col_a = self.cols[i];
-            let col_b = self.cols[6-i];
+            let col_b = self.cols[6 - i];
             state.write_u8(col_a.as_u8() | col_b.as_u8());
             state.write_u8(col_a.as_u8() & col_b.as_u8());
         }
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    make_board_tests!(SymmetricBitBoard);
+    make_mut_board_tests!(SymmetricBitBoard);
 }

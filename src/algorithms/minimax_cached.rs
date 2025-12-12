@@ -1,5 +1,5 @@
 use crate::basic::*;
-use crate::board::{Board, CloneBoard, MutBoard};
+use crate::board::{CloneBoard};
 use std::collections::HashMap;
 use std::hash::{Hash, RandomState};
 

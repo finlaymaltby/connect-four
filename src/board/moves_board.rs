@@ -51,7 +51,7 @@ impl CloneBoard for MovesBoard {}
 impl MutBoard for MovesBoard {
     fn unplace(&mut self, pos: &Position) {
         let mut col_count = 0;
-        for (i, (col, token)) in self.moves.iter().enumerate() {
+        for (i, (col, _)) in self.moves.iter().enumerate() {
             if *col == pos.col {
                 if col_count == usize::from(pos.row) {
                     self.moves.remove(i);

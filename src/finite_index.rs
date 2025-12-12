@@ -1,4 +1,4 @@
-use std::range::Step;
+use std::{fmt::Display, range::Step};
 
 /// Unsigned finite natural number type, with values in [0, N].
 /// Used for indexing a collection of N + 1 elements.
@@ -85,5 +85,11 @@ impl<const N: usize> Step for FiniteIndex<N> {
         } else {
             None
         }
+    }
+}
+
+impl<const N: usize> Display for FiniteIndex<N> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
     }
 }

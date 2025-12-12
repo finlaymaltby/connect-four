@@ -41,3 +41,12 @@ impl MutBoard for BitBoard {
         self.cols[usize::from(pos.col)].force_pop();
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    make_board_tests!(BitBoard);
+    make_mut_board_tests!(BitBoard);
+}

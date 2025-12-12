@@ -1,6 +1,8 @@
 use crate::basic::{Position, Token, column, row};
 use std::fmt::Debug;
 
+#[macro_use]
+pub mod testing;
 pub mod array_board;
 pub mod bit_board;
 mod bit_col;
@@ -31,7 +33,7 @@ pub trait Board: Debug + Sized + Eq {
             }
         }
 
-        if red_count <= yellow_count {
+        if red_count < yellow_count {
             Token::Red
         } else {
             Token::Yellow
