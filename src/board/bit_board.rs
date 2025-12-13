@@ -42,11 +42,10 @@ impl MutBoard for BitBoard {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     make_board_tests!(BitBoard);
     make_mut_board_tests!(BitBoard);
 }

@@ -1,5 +1,5 @@
 use crate::basic::*;
-use crate::board::{CloneBoard};
+use crate::board::CloneBoard;
 use std::collections::HashMap;
 use std::hash::{Hash, RandomState};
 
@@ -49,4 +49,27 @@ fn minimax_cached_helper<B: CloneBoard + Hash>(
 
     cache.insert(board, out);
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::board::{bit_board::BitBoard, symmetric_bit_board::SymmetricBitBoard};
+    use crate::test_boards;
+
+    use super::*;
+
+    fn test_board<B: CloneBoard + Hash>(board_str: &str, outcome: Option<Token>, depth: usize) {
+        let board = B::read(board_str);
+        let curr = board.curr_player();
+        
+        assert_eq!(minimax_cached(board, depth, curr), outcome, "{}", board_str);
+    }
+
+    #[test]
+    fn test_boards() {
+        for (board_str, outcome, depth) in test_boards::MEDIUM_TEST_BOARDS {
+            test_board::<BitBoard>(board_str, outcome, depth);
+            test_board::<SymmetricBitBoard>(board_str, outcome, depth);
+        }
+    }
 }

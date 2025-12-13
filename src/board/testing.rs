@@ -21,7 +21,7 @@ macro_rules! make_board_tests {
 macro_rules! make_mut_board_tests {
     ($b:ty) => {
         make_test!($b, mut_board_tests, place_unplace_eq);
-    }
+    };
 }
 
 pub mod board_tests {

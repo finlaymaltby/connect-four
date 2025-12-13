@@ -55,20 +55,17 @@ impl BitCol {
     }
 
     /// Pop the top token from the column.  
-    /// Panics if the column is empty.
+    /// Debug asserts that the column is not empty.
     pub fn force_pop(&mut self) {
-        if self.is_empty() {
-            panic!("Tried to pop from an empty column");
-        }
+        debug_assert!(!self.is_empty(), "Tried to pop from an empty column.");
         self.0 >>= 1;
     }
 
     /// Push a token onto the column.
-    /// Panics if the column is full.
+    /// Debug asserts that the column is not full.
     pub fn force_push(&mut self, token: &Token) {
-        if self.is_full() {
-            panic!("Tried to push onto a full column");
-        }
+        debug_assert!(!self.is_full(), "Tried to push onto a full column.");
+
         let token_bit = token_to_bit(token);
         self.0 <<= 1;
         self.0 |= token_bit;

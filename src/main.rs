@@ -13,9 +13,9 @@ mod algorithms;
 mod basic;
 mod board;
 mod finite_index;
-mod test_positions;
+mod test_boards;
 
-fn main() {
+fn speed_test() {
     let depth = 8;
 
     let board_str = "|.......|
@@ -51,7 +51,6 @@ fn main() {
     println!("{:?}", minimax_mut(&mut board, depth, Token::START));
     results.push(("BitBoard + minimax_mut", start.elapsed()));
 
-    let depth2 = 10;
     // ArrayBoard with minimax_cached
     let board = ArrayBoard::read(board_str);
     let start = Instant::now();
@@ -61,7 +60,7 @@ fn main() {
     // BitBoard with minimax_cached
     let board = BitBoard::read(board_str);
     let start = Instant::now();
-    println!("{:?}", minimax_cached(board, depth2, Token::START));
+    println!("{:?}", minimax_cached(board, depth, Token::START));
     results.push(("BitBoard + minimax_cached", start.elapsed()));
 
     // SymmetricBitBoard with minimax_copy
@@ -79,7 +78,7 @@ fn main() {
     // SymmetricBitBoard with minimax_cached
     let board = SymmetricBitBoard::read(board_str);
     let start = Instant::now();
-    println!("{:?}", minimax_cached(board, depth2, Token::START));
+    println!("{:?}", minimax_cached(board, depth, Token::START));
     results.push(("SymmetricBitBoard + minimax_cached", start.elapsed()));
 
     println!("\n{:<30} {:>15}", "Configuration", "Time (ms)");
@@ -87,4 +86,21 @@ fn main() {
     for (name, duration) in results {
         println!("{:<30} {:>15.2}", name, duration.as_secs_f64() * 1000.0);
     }
+}
+
+fn main() {
+    let depth = 12;
+
+    let board_str = "|.......|
+                     |.......|
+                     |.......|
+                     |...R...|
+                     |...Y...|
+                     |..RYYR.|";
+
+    // SymmetricBitBoard with minimax_cached
+    let board = SymmetricBitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_cached(board, depth, Token::START));
+    println!("{:?}", start.elapsed());
 }
