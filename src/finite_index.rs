@@ -10,8 +10,12 @@ impl<const N: usize> FiniteIndex<N> {
     pub const MAX: FiniteIndex<N> = FiniteIndex(N);
     pub const COUNT: usize = N + 1;
 
-    /// Creates a FiniteIndex from a raw usize value without checking bounds.
+    /// Creates a FiniteIndex from a raw usize value, panicking
+    /// when out of bounds.
     pub const fn raw(value: usize) -> Self {
+        if value > N {
+            panic!("FiniteIndex out of bounds error: value exceeds the maximum allowed");
+        }
         FiniteIndex(value)
     }
 
@@ -48,7 +52,7 @@ impl<const N: usize> TryFrom<usize> for FiniteIndex<N> {
             Ok(FiniteIndex(value))
         } else {
             Err(format!(
-                "FiniteIndex out of bounds error: {} >= {}",
+                "FiniteIndex out of bounds error: {} > {}",
                 value, N
             ))
         }

@@ -1,4 +1,4 @@
-use crate::basic::{Position, Token, column, row};
+use crate::{basic::{Position, Token, column, row}, board::moves::Moves};
 use std::fmt::Debug;
 
 #[macro_use]
@@ -6,8 +6,8 @@ pub mod testing;
 pub mod array_board;
 pub mod bit_board;
 mod bit_col;
-pub mod moves_board;
-pub mod symmetric_bit_board;
+pub mod moves;
+pub mod symm_board;
 
 /// Trait containing common board functionality.
 pub trait Board: Debug + Sized + Eq {
@@ -96,6 +96,7 @@ pub trait Board: Debug + Sized + Eq {
 
     /// Read a board from a string representation.
     fn read(string: &str) -> Self {
+
         let mut board = Self::EMPTY;
 
         for line in string.split('|').rev() {
@@ -117,6 +118,14 @@ pub trait Board: Debug + Sized + Eq {
             }
         }
 
+        board
+    }
+
+    fn from_moves(moves: &Moves) -> Self {
+        let mut board = Self::EMPTY;
+        for (col, token) in moves.moves.iter() {
+            board.place(&col, &token).unwrap();
+        }
         board
     }
 }

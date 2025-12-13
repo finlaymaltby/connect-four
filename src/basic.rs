@@ -51,6 +51,13 @@ pub mod column {
         Idx::raw(0),
         Idx::raw(6),
     ];
+
+    impl Idx {
+        /// Returns the column on the opposite side of the board, based on symmetry.
+        pub fn flip(&self) -> Self {
+            Self::raw(usize::from(Self::MAX) - usize::from(*self))
+        }
+    }
 }
 
 pub mod row {

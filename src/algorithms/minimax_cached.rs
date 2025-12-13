@@ -53,7 +53,7 @@ fn minimax_cached_helper<B: CloneBoard + Hash>(
 
 #[cfg(test)]
 mod tests {
-    use crate::board::{bit_board::BitBoard, symmetric_bit_board::SymmetricBitBoard};
+    use crate::board::{bit_board::BitBoard, symm_board::SymmBoard};
     use crate::test_boards;
 
     use super::*;
@@ -69,7 +69,7 @@ mod tests {
     fn test_boards() {
         for (board_str, outcome, depth) in test_boards::MEDIUM_TEST_BOARDS {
             test_board::<BitBoard>(board_str, outcome, depth);
-            test_board::<SymmetricBitBoard>(board_str, outcome, depth);
+            test_board::<SymmBoard>(board_str, outcome, depth);
         }
     }
 }

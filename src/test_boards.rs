@@ -4,8 +4,8 @@ use crate::basic::*;
 use crate::board::Board;
 use crate::board::array_board::ArrayBoard;
 use crate::board::bit_board::BitBoard;
-use crate::board::moves_board::MovesBoard;
-use crate::board::symmetric_bit_board::SymmetricBitBoard;
+use crate::board::moves::Moves;
+use crate::board::symm_board::SymmBoard;
 
 pub const SIMPLE: (&str, Option<Token>, usize) = (
     "|.......|

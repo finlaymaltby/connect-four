@@ -57,7 +57,7 @@ pub fn minimax_copy<B: CloneBoard>(board: B, depth: usize, curr: Token) -> Optio
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::board::{array_board::ArrayBoard, bit_board::BitBoard, symmetric_bit_board::SymmetricBitBoard};
+    use crate::board::{array_board::ArrayBoard, bit_board::BitBoard, symm_board::SymmBoard};
     use crate::test_boards;
 
     fn test_board_mut<B: MutBoard>(board_str: &str, outcome: Option<Token>, depth: usize) {
@@ -79,7 +79,7 @@ mod tests {
         for (board_str, outcome, depth) in test_boards::EASY_TEST_BOARDS {
             test_board_mut::<ArrayBoard>(board_str, outcome, depth);
             test_board_mut::<BitBoard>(board_str, outcome, depth);
-            test_board_mut::<SymmetricBitBoard>(board_str, outcome, depth);
+            test_board_mut::<SymmBoard>(board_str, outcome, depth);
         }
     }
 
@@ -87,9 +87,9 @@ mod tests {
     fn test_minimax_clone() {
 
         for (board_str, outcome, depth) in test_boards::EASY_TEST_BOARDS {
-            //test_board_clone::<ArrayBoard>(board_str, outcome, depth);
+            test_board_clone::<ArrayBoard>(board_str, outcome, depth);
             test_board_clone::<BitBoard>(board_str, outcome, depth);
-            //test_board_clone::<SymmetricBitBoard>(board_str, outcome, depth);
+            test_board_clone::<SymmBoard>(board_str, outcome, depth);
         }
     }
 }
