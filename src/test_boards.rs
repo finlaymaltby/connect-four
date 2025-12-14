@@ -1,11 +1,4 @@
-use crate::algorithms::minimax_basic::{minimax_copy, minimax_mut};
-use crate::algorithms::minimax_cached::minimax_cached;
 use crate::basic::*;
-use crate::board::Board;
-use crate::board::array_board::ArrayBoard;
-use crate::board::bit_board::BitBoard;
-use crate::board::moves::Moves;
-use crate::board::symm_board::SymmBoard;
 
 pub const SIMPLE: (&str, Option<Token>, usize) = (
     "|.......|

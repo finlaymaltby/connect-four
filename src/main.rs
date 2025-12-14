@@ -90,6 +90,7 @@ fn speed_test() {
 }
 
 fn main() {
+    speed_test();
     let depth = 13;
 
     let board_str = "|.......|

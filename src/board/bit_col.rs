@@ -1,5 +1,4 @@
 use crate::basic::*;
-use crate::board::{Board, CloneBoard, MutBoard};
 
 fn token_to_bit(token: &Token) -> u8 {
     match token {

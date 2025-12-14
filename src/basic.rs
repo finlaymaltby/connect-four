@@ -35,7 +35,7 @@ impl Display for Token {
 }
 
 pub mod column {
-    use super::*;
+    
 
     pub const COUNT: usize = 7;
 

@@ -40,7 +40,7 @@ fn make_diffs<B: Board>(board: &B) -> SymmDiff {
 
 pub fn minimax_symm<B: CloneBoard + Hash>(board: B, depth: usize, curr: Token) -> Option<Token> {
     let mut cache = HashMap::new();
-    let mut diffs = make_diffs(&board);
+    let diffs = make_diffs(&board);
     minimax_symm_helper(board, depth, curr, &mut cache, diffs)
 }
 
