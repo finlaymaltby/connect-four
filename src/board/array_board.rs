@@ -3,8 +3,6 @@ use std::ops::{Index, IndexMut};
 use crate::basic::*;
 use crate::board::{Board, CloneBoard, MutBoard};
 
-use crate::board::testing;
-
 /// MutBoard implementation using a 2D array of Option<Token>.
 /// An array of columns, where the 0th element is the bottom of the column.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

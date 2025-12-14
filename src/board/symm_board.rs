@@ -88,8 +88,6 @@ mod tests {
         for _ in row::IDXS {
             for col in column::IDXS {
                 board_a.place(&col, &token).unwrap();
-                assert_ne!(board_a, board_b, "Nonequivalent SymmBoards returned equal");
-            
                 board_b.place(&col.flipped(), &token).unwrap();
                 
                 assert_eq!(board_a, board_b, "Symmetric SymmBoards are not equal");

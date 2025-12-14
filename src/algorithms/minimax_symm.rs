@@ -1,4 +1,4 @@
-use crate::{basic::*, board};
+use crate::basic::*;
 use crate::board::{Board, CloneBoard};
 use std::collections::HashMap;
 use std::hash::{Hash, RandomState};

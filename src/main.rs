@@ -90,14 +90,14 @@ fn speed_test() {
 }
 
 fn main() {
-    let depth = 11;
+    let depth = 13;
 
     let board_str = "|.......|
                      |.......|
                      |.......|
                      |.......|
                      |.......|
-                     |..YYR..|";
+                     |.......|";
 
     let board = BitBoard::read(board_str);
     let start = Instant::now();
