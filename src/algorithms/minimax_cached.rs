@@ -15,7 +15,7 @@ fn minimax_cached_helper<B: CloneBoard + Hash>(
     cache: &mut HashMap<B, Option<Token>, RandomState>,
 ) -> Option<Token> {
     if depth == 0 {
-        cache.insert(board, None);
+        //cache.insert(board, None);
         return None;
     }
 

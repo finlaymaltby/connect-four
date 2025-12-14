@@ -90,7 +90,7 @@ mod tests {
                 board_a.place(&col, &token).unwrap();
                 assert_ne!(board_a, board_b, "Nonequivalent SymmBoards returned equal");
             
-                board_b.place(&col.flip(), &token).unwrap();
+                board_b.place(&col.flipped(), &token).unwrap();
                 
                 assert_eq!(board_a, board_b, "Symmetric SymmBoards are not equal");
                 let mut hasher_a = DefaultHasher::new();

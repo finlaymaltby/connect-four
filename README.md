@@ -6,3 +6,4 @@ Todo:
 - change read to return result
 - add assert valid to board
 - Decide between clone and copy
+- BoardCol ??

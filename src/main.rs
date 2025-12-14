@@ -1,6 +1,7 @@
 #![feature(step_trait, new_range_api)]
 use crate::algorithms::minimax_basic::{minimax_copy, minimax_mut};
 use crate::algorithms::minimax_cached::minimax_cached;
+use crate::algorithms::minimax_symm::minimax_symm;
 
 use crate::basic::*;
 use crate::board::Board;
@@ -89,18 +90,33 @@ fn speed_test() {
 }
 
 fn main() {
-    let depth = 12;
+    let depth = 11;
 
     let board_str = "|.......|
                      |.......|
                      |.......|
-                     |...R...|
-                     |...Y...|
-                     |..RYYR.|";
+                     |.......|
+                     |.......|
+                     |..YYR..|";
 
-    // SymmetricBitBoard with minimax_cached
+    let board = BitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_cached(board, depth, Token::START));
+    println!("bitboard + cached: {:?}", start.elapsed());
+
+    let board = BitBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_symm(board, depth, Token::START));
+    println!("bitboard + symm: {:?}", start.elapsed());
+
     let board = SymmBoard::read(board_str);
     let start = Instant::now();
     println!("{:?}", minimax_cached(board, depth, Token::START));
-    println!("{:?}", start.elapsed());
+    println!("symboard + cached: {:?}", start.elapsed());
+
+
+    let board = SymmBoard::read(board_str);
+    let start = Instant::now();
+    println!("{:?}", minimax_cached(board, depth, Token::START));
+    println!("symmboard + symm: {:?}", start.elapsed());
 }

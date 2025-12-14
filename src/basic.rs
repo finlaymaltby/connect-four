@@ -41,7 +41,16 @@ pub mod column {
 
     pub type Idx = super::FiniteIndex<6>;
 
-    pub const IDXS: RangeInclusive<Idx> = Idx::ZERO..=Idx::MAX;
+    pub const IDXS: [Idx; COUNT] = [
+        Idx::raw(0),
+        Idx::raw(1),
+        Idx::raw(2),
+        Idx::raw(3),
+        Idx::raw(4),
+        Idx::raw(5),
+        Idx::raw(6),
+    ];
+
     pub const IDXS_CENTRED_FIRST: [Idx; COUNT] = [
         Idx::raw(3),
         Idx::raw(2),
@@ -53,8 +62,9 @@ pub mod column {
     ];
 
     impl Idx {
+        pub const CENTRE: Self = Idx::raw(3);
         /// Returns the column on the opposite side of the board, based on symmetry.
-        pub fn flip(&self) -> Self {
+        pub fn flipped(&self) -> Self {
             Self::raw(usize::from(Self::MAX) - usize::from(*self))
         }
     }
@@ -71,7 +81,7 @@ pub mod row {
         pub const BOTTOM: Self = Self::ZERO;
         pub const TOP: Self = Self::MAX;
     }
-
+    /// bottom to top
     pub const IDXS: RangeInclusive<Idx> = Idx::ZERO..=Idx::MAX;
 }
 
@@ -144,4 +154,19 @@ impl Position {
             row: self.row.shift(-offset),
         })
     }
+
+    /// TODO. (left, right)
+    pub fn symm_pair(&self) -> Option<(Self, Self)> {
+        if self.col == column::Idx::CENTRE {
+            return None;
+        }
+        
+        let flipped = Position { col: self.col.flipped(), row: self.row };
+        if usize::from(self.col) < 3 {
+            Some((*self, flipped))
+        } else {
+            Some((flipped, *self))
+        }
+    }
+
 }
