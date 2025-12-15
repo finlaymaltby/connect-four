@@ -14,7 +14,7 @@ fn make_diffs<B: Board>(board: &B) -> SymmDiff {
     for &col_l in column::IDXS[0..3].iter() {
         let col_r = col_l.flipped();
 
-        for row in row::IDXS {
+        for row in row::BOTTOM_UP {
             let token_l = board.get(&Position {col: col_l, row});
             let token_r = board.get(&Position {col: col_r, row});
             match (token_l, token_r) {
@@ -148,5 +148,20 @@ mod tests {
             test_board::<BitBoard>(board_str, outcome, depth);
             test_board::<SymmBoard>(board_str, outcome, depth);
         }
+    }
+
+
+    #[test]
+    fn test_symm() {
+        let board = BitBoard::EMPTY;
+        let mut cache = HashMap::new();
+        let diffs = make_diffs(&board);
+        minimax_symm_helper(board, 8, Token::START, &mut cache, diffs);
+
+        for board in cache.keys() {
+            assert!(!cache.contains_key(&board.flipped()), "minimax_symm visited this board and its reflection:\n");
+            board.display();
+        }
+
     }
 }

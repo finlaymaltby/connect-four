@@ -30,7 +30,7 @@ pub mod board_tests {
     pub fn empty_is_empty<B: Board>(name: &str) {
         let empty = B::EMPTY;
         for col in column::IDXS {
-            for row in row::IDXS {
+            for row in row::BOTTOM_UP {
                 assert!(
                     empty.get(&Position { col, row }).is_none(),
                     "`{name}::EMPTY` is not empty at ({col}, {row})."

@@ -85,7 +85,7 @@ mod tests {
         let mut board_a = SymmBoard::EMPTY;
         let mut board_b = SymmBoard::EMPTY;
         let mut token = Token::START;
-        for _ in row::IDXS {
+        for _ in row::BOTTOM_UP {
             for col in column::IDXS {
                 board_a.place(&col, &token).unwrap();
                 board_b.place(&col.flipped(), &token).unwrap();

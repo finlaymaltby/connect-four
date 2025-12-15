@@ -82,7 +82,7 @@ pub mod row {
         pub const TOP: Self = Self::MAX;
     }
     /// bottom to top
-    pub const IDXS: RangeInclusive<Idx> = Idx::ZERO..=Idx::MAX;
+    pub const BOTTOM_UP: RangeInclusive<Idx> = Idx::ZERO..=Idx::MAX;
 }
 
 /// A Position on the board, defined by a column and row index.

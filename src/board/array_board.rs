@@ -42,7 +42,7 @@ impl Board for ArrayBoard {
     }
 
     fn place(&mut self, col: &column::Idx, token: &Token) -> Option<Position> {
-        for row in row::IDXS {
+        for row in row::BOTTOM_UP {
             if self[&Position { col: *col, row }].is_none() {
                 self[&Position { col: *col, row }] = Some(*token);
                 return Some(Position {

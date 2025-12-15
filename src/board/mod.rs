@@ -1,5 +1,5 @@
 use crate::{basic::{Position, Token, column, row}, board::moves::Moves};
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 
 #[macro_use]
 pub mod testing;
@@ -22,7 +22,7 @@ pub trait Board: Debug + Sized + Eq {
         let mut red_count = 0;
         let mut yellow_count = 0;
 
-        for row in row::IDXS {
+        for row in row::BOTTOM_UP {
             for col in column::IDXS {
                 let pos = Position { col, row };
                 match self.get(&pos) {
@@ -79,7 +79,7 @@ pub trait Board: Debug + Sized + Eq {
 
     /// Pretty displays the board to stdout.
     fn display(&self) {
-        for row in row::IDXS.rev() {
+        for row in row::BOTTOM_UP.rev() {
             print!("|");
             for col in column::IDXS {
                 let pos = Position { col, row };
@@ -159,6 +159,20 @@ pub trait CloneBoard: Board + Clone {
             .iter()
             .filter_map(move |col| self.clone_and_place(&col, token))
     }
+
+    /// TODO
+    fn flipped(&self) -> Self {
+        let mut board = Self::EMPTY;
+        for col in column::IDXS {
+            for row in row::BOTTOM_UP {
+                if let Some(token) = self.get(&Position {col, row}) {
+                    board.place(&col.flipped(), &token);
+                }
+            }
+        }
+
+        board
+    }
 }
 
 /// Trait for board implementations that don't have a cheap clone operation
@@ -183,6 +197,8 @@ fn check_line<T: Iterator<Item = Option<Token>>>(line: T, token: &Token) -> bool
     }
     false
 }
+
+
 
 #[cfg(test)]
 mod mut_board_tests {
