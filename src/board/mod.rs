@@ -77,21 +77,30 @@ pub trait Board: Debug + Sized + Eq {
         return false;
     }
 
-    /// Pretty displays the board to stdout.
-    fn display(&self) {
+    /// String pretty display
+    fn to_string(&self) -> String {
+        let mut string = "\n".to_owned();
+
         for row in row::BOTTOM_UP.rev() {
-            print!("|");
+            string.push('|');
             for col in column::IDXS {
                 let pos = Position { col, row };
                 match self.get(&pos) {
-                    Some(Token::Red) => print!("R"),
-                    Some(Token::Yellow) => print!("Y"),
-                    None => print!(" "),
+                    Some(Token::Red) => string.push('R'),
+                    Some(Token::Yellow) => string.push('Y'),
+                    None => string.push(' '),
                 }
             }
-            println!("|");
+            string.push_str("|\n");
         }
-        println!("+--------+");
+        string.push_str("+--------+\n");
+
+        string
+    }
+
+    /// Pretty displays the board to stdout.
+    fn display(&self) {
+        print!("{}", self.to_string());
     }
 
     /// Read a board from a string representation.
@@ -128,6 +137,8 @@ pub trait Board: Debug + Sized + Eq {
         }
         board
     }
+
+
 }
 
 /// Trait for board implementations that have a cheap clone operation.

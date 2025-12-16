@@ -155,6 +155,10 @@ impl Position {
         })
     }
 
+    pub fn flipped(&self) -> Self {
+        Position {col: self.col.flipped(), row: self.row}
+    }
+
     /// TODO. (left, right)
     pub fn symm_pair(&self) -> Option<(Self, Self)> {
         if self.col == column::Idx::CENTRE {

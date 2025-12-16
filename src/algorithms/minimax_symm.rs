@@ -150,6 +150,18 @@ mod tests {
         }
     }
 
+    fn board_is_symm(board: &BitBoard) -> bool {
+        for col in column::IDXS {
+            for row in row::BOTTOM_UP {
+                let pos = Position {col, row};
+                if board.get(&pos) != board.get(&pos.flipped()) {
+                    return false;
+                }
+            }
+        }
+
+        true
+    }
 
     #[test]
     fn test_symm() {
@@ -159,8 +171,11 @@ mod tests {
         minimax_symm_helper(board, 8, Token::START, &mut cache, diffs);
 
         for board in cache.keys() {
-            assert!(!cache.contains_key(&board.flipped()), "minimax_symm visited this board and its reflection:\n");
-            board.display();
+            if board_is_symm(board) {
+                continue;
+            }
+
+            assert!(!cache.contains_key(&board.flipped()), "minimax_symm visited this board and its reflection:\n{}", board.to_string());
         }
 
     }

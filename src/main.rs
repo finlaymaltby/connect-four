@@ -1,4 +1,6 @@
 #![feature(step_trait, new_range_api)]
+#![allow(unused)]
+
 use crate::algorithms::minimax_basic::{minimax_copy, minimax_mut};
 use crate::algorithms::minimax_cached::minimax_cached;
 use crate::algorithms::minimax_symm::minimax_symm;
@@ -90,7 +92,6 @@ fn speed_test() {
 }
 
 fn main() {
-    speed_test();
     let depth = 13;
 
     let board_str = "|.......|
@@ -98,7 +99,7 @@ fn main() {
                      |.......|
                      |.......|
                      |.......|
-                     |.......|";
+                     |..Y.R..|";
 
     let board = BitBoard::read(board_str);
     let start = Instant::now();
