@@ -18,11 +18,11 @@ impl Moves {
 impl Board for Moves {
     const EMPTY: Self = Moves { moves: Vec::new() };
 
-    fn get(&self, pos: &Position) -> Option<Token> {
+    fn get(&self, cell: &Cell) -> Option<Token> {
         let mut col_count = 0;
         for (col, token) in &self.moves {
-            if *col == pos.col {
-                if col_count == usize::from(pos.row) {
+            if *col == cell.col {
+                if col_count == usize::from(cell.row) {
                     return Some(*token);
                 }
                 col_count += 1;
@@ -35,11 +35,11 @@ impl Board for Moves {
         self.count_in_column(col) < row::COUNT
     }
 
-    fn place(&mut self, col: &column::Idx, token: &Token) -> Option<Position> {
+    fn place(&mut self, col: &column::Idx, token: &Token) -> Option<Cell> {
         let row = self.count_in_column(col);
         let row = row::Idx::try_from(row).ok()?;
         self.moves.push((*col, *token));
-        Some(Position {
+        Some(Cell {
             row: row::Idx::try_from(row).unwrap(),
             col: *col,
         })
@@ -49,11 +49,11 @@ impl Board for Moves {
 impl CloneBoard for Moves {}
 
 impl MutBoard for Moves {
-    fn unplace(&mut self, pos: &Position) {
+    fn unplace(&mut self, cell: &Cell) {
         let mut col_count = 0;
         for (i, (col, _)) in self.moves.iter().enumerate() {
-            if *col == pos.col {
-                if col_count == usize::from(pos.row) {
+            if *col == cell.col {
+                if col_count == usize::from(cell.row) {
                     self.moves.remove(i);
                     return;
                 }

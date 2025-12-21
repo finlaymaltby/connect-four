@@ -8,7 +8,7 @@ pub fn minimax_cached<B: CloneBoard + Hash>(board: B, depth: usize, curr: Token)
     minimax_cached_helper(board, depth, curr, &mut cache)
 }
 
-fn minimax_cached_helper<B: CloneBoard + Hash>(
+pub fn minimax_cached_helper<B: CloneBoard + Hash>(
     board: B,
     depth: usize,
     curr: Token,
@@ -27,8 +27,8 @@ fn minimax_cached_helper<B: CloneBoard + Hash>(
 
     let mut losing = true;
 
-    for (next_board, pos) in board.next_boards(&curr) {
-        if next_board.won_at(&pos) {
+    for (next_board, cell) in board.next_boards(&curr) {
+        if next_board.won_at(&cell) {
             out = Some(curr);
             break;
         }
@@ -53,23 +53,27 @@ fn minimax_cached_helper<B: CloneBoard + Hash>(
 
 #[cfg(test)]
 mod tests {
-    use crate::board::{bit_board::BitBoard, symm_board::SymmBoard};
-    use crate::test_boards;
-
     use super::*;
+    use crate::board::{
+        Board, array_board::ArrayBoard, bit_board::BitBoard, symm_board::SymmBoard,
+    };
 
-    fn test_board<B: CloneBoard + Hash>(board_str: &str, outcome: Option<Token>, depth: usize) {
-        let board = B::read(board_str);
-        let curr = board.curr_player();
-        
-        assert_eq!(minimax_cached(board, depth, curr), outcome, "{}", board_str);
-    }
+    make_easy_tests!(
+        |mut b, d| {
+            let curr = b.curr_player();
+            minimax_cached(b, d, curr)
+        },
+        ArrayBoard,
+        BitBoard,
+        SymmBoard
+    );
 
-    #[test]
-    fn test_boards() {
-        for (board_str, outcome, depth) in test_boards::MEDIUM_TEST_BOARDS {
-            test_board::<BitBoard>(board_str, outcome, depth);
-            test_board::<SymmBoard>(board_str, outcome, depth);
-        }
-    }
+    make_medium_tests!(
+        |mut b, d| {
+            let curr = b.curr_player();
+            minimax_cached(b, d, curr)
+        },
+        SymmBoard,
+        ArrayBoard
+    );
 }

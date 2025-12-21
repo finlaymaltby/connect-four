@@ -36,6 +36,17 @@ impl<const N: usize> FiniteIndex<N> {
     pub fn sub(&self, by: usize) -> Self {
         FiniteIndex(self.0.saturating_sub(by))
     }
+
+    /// Tries to shift the value by the given amount,
+    /// returning None when out of bounds
+    pub fn try_shift(&self, by: isize) -> Option<Self> {
+        let val = self.0.checked_add_signed(by)?;
+        if val <= N {
+            Some(FiniteIndex(val))
+        } else {
+            None
+        }
+    }
 }
 
 impl<const N: usize> From<FiniteIndex<N>> for usize {

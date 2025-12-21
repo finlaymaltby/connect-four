@@ -1,4 +1,4 @@
-use crate::basic::{Position, Token, column, row};
+use crate::basic::{Cell, Token, column, row};
 use crate::board::{Board, MutBoard};
 
 macro_rules! make_test {
@@ -32,7 +32,7 @@ pub mod board_tests {
         for col in column::IDXS {
             for row in row::BOTTOM_UP {
                 assert!(
-                    empty.get(&Position { col, row }).is_none(),
+                    empty.get(&Cell { col, row }).is_none(),
                     "`{name}::EMPTY` is not empty at ({col}, {row})."
                 );
             }
@@ -54,9 +54,9 @@ pub mod board_tests {
                     board.curr_player(),
                     "`{name}::curr_player` returned incorrect."
                 );
-                let pos = board.place(&col, &curr);
+                let cell = board.place(&col, &curr);
                 assert!(
-                    pos.is_some(),
+                    cell.is_some(),
                     "`{name}::place` returned `None` even though `can_place` is true"
                 );
                 curr = curr.next();
@@ -78,11 +78,11 @@ pub mod board_tests {
              |YYYY   |",
         );
         assert!(
-            board.won_at(&Position {
+            board.won_at(&Cell {
                 col: column::Idx::raw(3),
                 row: row::Idx::raw(0)
             }),
-            "`{name}::won_at returned false on a winning position."
+            "`{name}::won_at returned false on a winning cell."
         );
     }
 }
@@ -97,10 +97,10 @@ pub mod mut_board_tests {
             for col in column::IDXS {
                 let temp = board.clone();
 
-                let Some(pos) = board.place(&col, &token) else {
+                let Some(cell) = board.place(&col, &token) else {
                     panic!("`{name}::place returned None on a non-full column.");
                 };
-                board.unplace(&pos);
+                board.unplace(&cell);
                 assert_eq!(board, temp, "`{name}::unplace∘{name}::place` != id.");
                 board.place(&col, &token);
                 token = token.next();

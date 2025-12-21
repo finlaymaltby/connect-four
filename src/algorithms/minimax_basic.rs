@@ -1,3 +1,4 @@
+use crate::algorithms;
 use crate::basic::*;
 use crate::board::{CloneBoard, MutBoard};
 
@@ -9,40 +10,40 @@ pub fn minimax_mut<B: MutBoard>(board: &mut B, depth: usize, curr: Token) -> Opt
     let mut losing = true;
 
     for col in column::IDXS {
-        if let Some(pos) = board.place(&col, &curr) {
-            if board.won_at(&pos) {
-                board.unplace(&pos);
+        if let Some(cell) = board.place(&col, &curr) {
+            if board.won_at(&cell) {
+                board.unplace(&cell);
                 return Some(curr);
             }
 
             if let Some(winner) = minimax_mut(board, depth - 1, curr.next()) {
                 if winner == curr {
-                    board.unplace(&pos);
+                    board.unplace(&cell);
                     return Some(curr);
                 }
             } else {
                 losing = false;
             }
-            board.unplace(&pos);
+            board.unplace(&cell);
         }
     }
 
     if losing { Some(curr.next()) } else { None }
 }
 
-pub fn minimax_copy<B: CloneBoard>(board: B, depth: usize, curr: Token) -> Option<Token> {
+pub fn minimax_clone<B: CloneBoard>(board: B, depth: usize, curr: Token) -> Option<Token> {
     if depth == 0 {
         return None;
     }
 
     let mut losing = true;
 
-    for (next_board, pos) in board.next_boards(&curr) {
-        if next_board.won_at(&pos) {
+    for (next_board, cell) in board.next_boards(&curr) {
+        if next_board.won_at(&cell) {
             return Some(curr);
         }
 
-        if let Some(winner) = minimax_copy(next_board, depth - 1, curr.next()) {
+        if let Some(winner) = minimax_clone(next_board, depth - 1, curr.next()) {
             if winner == curr {
                 return Some(curr);
             }
@@ -55,41 +56,60 @@ pub fn minimax_copy<B: CloneBoard>(board: B, depth: usize, curr: Token) -> Optio
 }
 
 #[cfg(test)]
-mod tests {
+mod mut_tests {
     use super::*;
-    use crate::board::{array_board::ArrayBoard, bit_board::BitBoard, symm_board::SymmBoard};
-    use crate::test_boards;
+    use crate::board::{
+        Board, array_board::ArrayBoard, bit_board::BitBoard, symm_board::SymmBoard,
+    };
 
-    fn test_board_mut<B: MutBoard>(board_str: &str, outcome: Option<Token>, depth: usize) {
-        let mut board = B::read(board_str);
+    fn run_minimax_mut<B: MutBoard>(mut board: B, depth: usize) -> Option<Token> {
         let curr = board.curr_player();
-        
-        assert_eq!(minimax_mut(&mut board, depth, curr), outcome, "{}", board_str);
+        minimax_mut(&mut board, depth, curr)
     }
 
-    fn test_board_clone<B: CloneBoard>(board_str: &str, outcome: Option<Token>, depth: usize) {
-        let board = B::read(board_str);
-        let curr = board.curr_player();
-        
-        assert_eq!(minimax_copy(board, depth, curr), outcome, "{}", board_str);
-    }
+    make_easy_tests!(
+        |mut b, d| {
+            let curr = b.curr_player();
+            minimax_mut(&mut b, d, curr)
+        },
+        ArrayBoard,
+        BitBoard,
+        SymmBoard
+    );
+    make_medium_tests!(
+        |mut b, d| {
+            let curr = b.curr_player();
+            minimax_mut(&mut b, d, curr)
+        },
+        ArrayBoard,
+        BitBoard,
+        SymmBoard
+    );
+}
 
-    #[test]
-    fn test_minimax_mut() {
-        for (board_str, outcome, depth) in test_boards::EASY_TEST_BOARDS {
-            test_board_mut::<ArrayBoard>(board_str, outcome, depth);
-            test_board_mut::<BitBoard>(board_str, outcome, depth);
-            test_board_mut::<SymmBoard>(board_str, outcome, depth);
-        }
-    }
+#[cfg(test)]
+mod clone_tests {
+    use super::*;
+    use crate::board::{
+        Board, array_board::ArrayBoard, bit_board::BitBoard, symm_board::SymmBoard,
+    };
 
-    #[test]
-    fn test_minimax_clone() {
-
-        for (board_str, outcome, depth) in test_boards::EASY_TEST_BOARDS {
-            test_board_clone::<ArrayBoard>(board_str, outcome, depth);
-            test_board_clone::<BitBoard>(board_str, outcome, depth);
-            test_board_clone::<SymmBoard>(board_str, outcome, depth);
-        }
-    }
+    make_easy_tests!(
+        |mut b, d| {
+            let curr = b.curr_player();
+            minimax_clone(b, d, curr)
+        },
+        ArrayBoard,
+        BitBoard,
+        SymmBoard
+    );
+    make_medium_tests!(
+        |mut b, d| {
+            let curr = b.curr_player();
+            minimax_mut(&mut b, d, curr)
+        },
+        ArrayBoard,
+        BitBoard,
+        SymmBoard
+    );
 }

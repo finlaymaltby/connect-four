@@ -12,22 +12,22 @@ impl Board for BitBoard {
         cols: [bit_col::BitCol::EMPTY; column::COUNT],
     };
 
-    fn get(&self, pos: &Position) -> Option<Token> {
-        self.cols[usize::from(pos.col)].get(&pos.row)
+    fn get(&self, cell: &Cell) -> Option<Token> {
+        self.cols[usize::from(cell.col)].get(&cell.row)
     }
 
     fn can_place(&self, col: &column::Idx) -> bool {
         !self.cols[usize::from(*col)].is_full()
     }
 
-    fn place(&mut self, col: &column::Idx, token: &Token) -> Option<Position> {
+    fn place(&mut self, col: &column::Idx, token: &Token) -> Option<Cell> {
         if self.can_place(col) == false {
             return None;
         }
 
         let col_idx = usize::from(*col);
         self.cols[col_idx].force_push(token);
-        Some(Position {
+        Some(Cell {
             col: *col,
             row: row::Idx::try_from(self.cols[col_idx].count() - 1).unwrap(),
         })
@@ -37,8 +37,8 @@ impl Board for BitBoard {
 impl CloneBoard for BitBoard {}
 
 impl MutBoard for BitBoard {
-    fn unplace(&mut self, pos: &Position) {
-        self.cols[usize::from(pos.col)].force_pop();
+    fn unplace(&mut self, cell: &Cell) {
+        self.cols[usize::from(cell.col)].force_pop();
     }
 }
 

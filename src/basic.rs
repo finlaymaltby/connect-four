@@ -35,7 +35,6 @@ impl Display for Token {
 }
 
 pub mod column {
-    
 
     pub const COUNT: usize = 7;
 
@@ -85,29 +84,36 @@ pub mod row {
     pub const BOTTOM_UP: RangeInclusive<Idx> = Idx::ZERO..=Idx::MAX;
 }
 
-/// A Position on the board, defined by a column and row index.
+/// A Cell on the board, defined by a column and row index.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
-pub struct Position {
+pub struct Cell {
     pub col: column::Idx,
     pub row: row::Idx,
 }
 
-impl Position {
-    /// Returns an iterator over the positions in the same row as this position,
+impl Cell {
+    /// Tries to shift by (col, row)
+    pub fn try_shift(&self, by: (isize, isize)) -> Option<Cell> {
+        let col = self.col.try_shift(by.0)?;
+        let row = self.row.try_shift(by.1)?;
+        Some(Cell { col, row })
+    }
+
+    /// Returns an iterator over the cells in the same row as this cell,
     /// from 3 columns to the left to 3 columns to the right (capped at the board edges).
-    pub fn row_neighbourhood(&self) -> impl Iterator<Item = Position> {
-        (self.col.shift(-3)..=self.col.shift(3)).map(move |col| Position { col, row: self.row })
+    pub fn row_neighbourhood(&self) -> impl Iterator<Item = Cell> {
+        (self.col.shift(-3)..=self.col.shift(3)).map(move |col| Cell { col, row: self.row })
     }
 
-    /// Returns an iterator over the positions in the same column as this position,
+    /// Returns an iterator over the cells in the same column as this cell,
     /// from 3 rows below to 3 rows above (capped at the board edges).
-    pub fn col_neighbourhood(&self) -> impl Iterator<Item = Position> {
-        (self.row.shift(-3)..=self.row.shift(3)).map(move |row| Position { col: self.col, row })
+    pub fn col_neighbourhood(&self) -> impl Iterator<Item = Cell> {
+        (self.row.shift(-3)..=self.row.shift(3)).map(move |row| Cell { col: self.col, row })
     }
 
-    /// Returns an iterator over the positions in the same diagonal (bottom-left to top-right)
-    /// as this position within a distance of 3 (capped at the board edges).
-    pub fn diag1_neighbourhood(&self) -> impl Iterator<Item = Position> {
+    /// Returns an iterator over the cells in the same diagonal (bottom-left to top-right)
+    /// as this cell within a distance of 3 (capped at the board edges).
+    pub fn diag1_neighbourhood(&self) -> impl Iterator<Item = Cell> {
         let start_offset = -min(
             3,
             min(
@@ -124,15 +130,15 @@ impl Position {
             ),
         );
 
-        (start_offset..=end_offset).map(move |offset| Position {
+        (start_offset..=end_offset).map(move |offset| Cell {
             col: self.col.shift(offset),
             row: self.row.shift(offset),
         })
     }
 
-    /// Returns an iterator over the positions in the same diagonal (top-left to bottom-right)
-    /// as this position within a distance of 3 (capped at the board edges).
-    pub fn diag2_neighbourhood(&self) -> impl Iterator<Item = Position> {
+    /// Returns an iterator over the cells in the same diagonal (top-left to bottom-right)
+    /// as this cell within a distance of 3 (capped at the board edges).
+    pub fn diag2_neighbourhood(&self) -> impl Iterator<Item = Cell> {
         let start_offset = -min(
             3,
             min(
@@ -149,14 +155,17 @@ impl Position {
             ),
         );
 
-        (start_offset..=end_offset).map(move |offset| Position {
+        (start_offset..=end_offset).map(move |offset| Cell {
             col: self.col.shift(offset),
             row: self.row.shift(-offset),
         })
     }
 
     pub fn flipped(&self) -> Self {
-        Position {col: self.col.flipped(), row: self.row}
+        Cell {
+            col: self.col.flipped(),
+            row: self.row,
+        }
     }
 
     /// TODO. (left, right)
@@ -164,13 +173,15 @@ impl Position {
         if self.col == column::Idx::CENTRE {
             return None;
         }
-        
-        let flipped = Position { col: self.col.flipped(), row: self.row };
+
+        let flipped = Cell {
+            col: self.col.flipped(),
+            row: self.row,
+        };
         if usize::from(self.col) < 3 {
             Some((*self, flipped))
         } else {
             Some((flipped, *self))
         }
     }
-
 }

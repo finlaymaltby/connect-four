@@ -14,22 +14,22 @@ impl Board for SymmBoard {
         cols: [bit_col::BitCol::EMPTY; column::COUNT],
     };
 
-    fn get(&self, pos: &Position) -> Option<Token> {
-        self.cols[usize::from(pos.col)].get(&pos.row)
+    fn get(&self, cell: &Cell) -> Option<Token> {
+        self.cols[usize::from(cell.col)].get(&cell.row)
     }
 
     fn can_place(&self, col: &column::Idx) -> bool {
         !self.cols[usize::from(*col)].is_full()
     }
 
-    fn place(&mut self, col: &column::Idx, token: &Token) -> Option<Position> {
+    fn place(&mut self, col: &column::Idx, token: &Token) -> Option<Cell> {
         if self.can_place(col) == false {
             return None;
         }
 
         let col_idx = usize::from(*col);
         self.cols[col_idx].force_push(token);
-        Some(Position {
+        Some(Cell {
             col: *col,
             row: row::Idx::try_from(self.cols[col_idx].count() - 1).unwrap(),
         })
@@ -39,8 +39,8 @@ impl Board for SymmBoard {
 impl CloneBoard for SymmBoard {}
 
 impl MutBoard for SymmBoard {
-    fn unplace(&mut self, pos: &Position) {
-        self.cols[usize::from(pos.col)].force_pop();
+    fn unplace(&mut self, cell: &Cell) {
+        self.cols[usize::from(cell.col)].force_pop();
     }
 }
 
@@ -79,7 +79,6 @@ mod tests {
     make_board_tests!(SymmBoard);
     make_mut_board_tests!(SymmBoard);
 
-
     #[test]
     fn test_symmetry() {
         let mut board_a = SymmBoard::EMPTY;
@@ -89,14 +88,17 @@ mod tests {
             for col in column::IDXS {
                 board_a.place(&col, &token).unwrap();
                 board_b.place(&col.flipped(), &token).unwrap();
-                
+
                 assert_eq!(board_a, board_b, "Symmetric SymmBoards are not equal");
                 let mut hasher_a = DefaultHasher::new();
                 let mut hasher_b = DefaultHasher::new();
                 board_a.hash(&mut hasher_a);
                 board_b.hash(&mut hasher_b);
-                assert_eq!(hasher_a.finish(), hasher_b.finish(), "Symmetric SymmBoards have different hashes");
-
+                assert_eq!(
+                    hasher_a.finish(),
+                    hasher_b.finish(),
+                    "Symmetric SymmBoards have different hashes"
+                );
             }
         }
     }

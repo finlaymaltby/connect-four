@@ -10,16 +10,16 @@ pub struct ArrayBoard {
     grid: [[Option<Token>; row::COUNT]; column::COUNT],
 }
 
-impl Index<&Position> for ArrayBoard {
+impl Index<&Cell> for ArrayBoard {
     type Output = Option<Token>;
 
-    fn index(&self, index: &Position) -> &Self::Output {
+    fn index(&self, index: &Cell) -> &Self::Output {
         &self.grid[usize::from(index.col)][usize::from(index.row)]
     }
 }
 
-impl IndexMut<&Position> for ArrayBoard {
-    fn index_mut(&mut self, index: &Position) -> &mut Self::Output {
+impl IndexMut<&Cell> for ArrayBoard {
+    fn index_mut(&mut self, index: &Cell) -> &mut Self::Output {
         &mut self.grid[usize::from(index.col)][usize::from(index.row)]
     }
 }
@@ -30,22 +30,22 @@ impl Board for ArrayBoard {
     };
 
     fn can_place(&self, col: &column::Idx) -> bool {
-        self[&Position {
+        self[&Cell {
             col: *col,
             row: row::Idx::TOP,
         }]
             .is_none()
     }
 
-    fn get(&self, pos: &Position) -> Option<Token> {
-        self[pos]
+    fn get(&self, cell: &Cell) -> Option<Token> {
+        self[cell]
     }
 
-    fn place(&mut self, col: &column::Idx, token: &Token) -> Option<Position> {
+    fn place(&mut self, col: &column::Idx, token: &Token) -> Option<Cell> {
         for row in row::BOTTOM_UP {
-            if self[&Position { col: *col, row }].is_none() {
-                self[&Position { col: *col, row }] = Some(*token);
-                return Some(Position {
+            if self[&Cell { col: *col, row }].is_none() {
+                self[&Cell { col: *col, row }] = Some(*token);
+                return Some(Cell {
                     col: *col,
                     row: row,
                 });
@@ -58,8 +58,8 @@ impl Board for ArrayBoard {
 impl CloneBoard for ArrayBoard {}
 
 impl MutBoard for ArrayBoard {
-    fn unplace(&mut self, pos: &Position) {
-        self[pos] = None;
+    fn unplace(&mut self, cell: &Cell) {
+        self[cell] = None;
     }
 }
 
