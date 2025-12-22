@@ -1,8 +1,8 @@
 use crate::algorithms::minimax_cached::minimax_cached_helper;
 use crate::basic::*;
 use crate::board::{Board, CloneBoard};
-use std::collections::HashMap;
-use std::hash::{Hash, RandomState};
+use hashbrown::HashMap;
+use std::hash::Hash;
 
 /// Type to store the difference in height of each column with its reflection,
 /// to efficiently compute when board is symmetrical.
@@ -97,7 +97,7 @@ fn minimax_symm_helper<B: CloneBoard + Hash>(
     board: B,
     depth: usize,
     curr: Token,
-    cache: &mut HashMap<B, Option<Token>, RandomState>,
+    cache: &mut HashMap<B, Option<Token>>,
     diffs: SymmDiff,
 ) -> Option<Token> {
     if depth == 0 {

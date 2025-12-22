@@ -95,8 +95,8 @@ fn main() {
                      |.......|
                      |.......|
                      |.......|
-                     |...R...|
-                     |..YYR..|";
+                     |.......|
+                     |.......|";
 
     let board = BitBoard::read(board_str);
     let start = Instant::now();

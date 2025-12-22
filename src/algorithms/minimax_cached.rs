@@ -1,6 +1,6 @@
 use crate::basic::*;
 use crate::board::CloneBoard;
-use std::collections::HashMap;
+use hashbrown::HashMap;
 use std::hash::{Hash, RandomState};
 
 pub fn minimax_cached<B: CloneBoard + Hash>(board: B, depth: usize, curr: Token) -> Option<Token> {
@@ -12,7 +12,7 @@ pub fn minimax_cached_helper<B: CloneBoard + Hash>(
     board: B,
     depth: usize,
     curr: Token,
-    cache: &mut HashMap<B, Option<Token>, RandomState>,
+    cache: &mut HashMap<B, Option<Token>>,
 ) -> Option<Token> {
     if depth == 0 {
         return None;

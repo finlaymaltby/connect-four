@@ -1,10 +1,8 @@
 use crate::basic::*;
 use crate::board::CloneBoard;
 use binary_heap_plus::*;
-use std::{
-    collections::HashMap,
-    hash::{Hash, RandomState},
-};
+use std::hash::Hash;
+use hashbrown::HashMap;
 
 pub fn minimax_counting<B: CloneBoard + Hash>(
     board: B,
@@ -19,7 +17,7 @@ pub fn minimax_counting_helper<B: CloneBoard + Hash>(
     board: B,
     depth: usize,
     curr: Token,
-    cache: &mut HashMap<B, Option<Token>, RandomState>,
+    cache: &mut HashMap<B, Option<Token>>,
 ) -> Option<Token> {
     if depth == 0 {
         return None;

@@ -1,6 +1,7 @@
 use crate::basic::*;
 use crate::board::{Board, CloneBoard, MutBoard, bit_col};
 
+
 /// A board implementation using bit manipulation for storage.
 /// Each column is stored as a BitCol.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
