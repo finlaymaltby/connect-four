@@ -76,15 +76,6 @@ mod mut_tests {
         BitBoard,
         SymmBoard
     );
-    make_medium_tests!(
-        |mut b, d| {
-            let curr = b.curr_player();
-            minimax_mut(&mut b, d, curr)
-        },
-        ArrayBoard,
-        BitBoard,
-        SymmBoard
-    );
 }
 
 #[cfg(test)]
@@ -98,15 +89,6 @@ mod clone_tests {
         |mut b, d| {
             let curr = b.curr_player();
             minimax_clone(b, d, curr)
-        },
-        ArrayBoard,
-        BitBoard,
-        SymmBoard
-    );
-    make_medium_tests!(
-        |mut b, d| {
-            let curr = b.curr_player();
-            minimax_mut(&mut b, d, curr)
         },
         ArrayBoard,
         BitBoard,

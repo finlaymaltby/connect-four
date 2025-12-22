@@ -3,6 +3,7 @@
 
 use crate::algorithms::minimax_basic::{minimax_clone, minimax_mut};
 use crate::algorithms::minimax_cached::minimax_cached;
+use crate::algorithms::minimax_counting::minimax_counting;
 use crate::algorithms::minimax_symm::minimax_symm;
 
 use crate::basic::*;
@@ -90,25 +91,40 @@ fn speed_test() {
 fn main() {
     let depth = 14;
 
-    let board_str = MEDIUM_1.board;
+    let board_str = "|.......|
+                     |.......|
+                     |.......|
+                     |.......|
+                     |...R...|
+                     |..YYR..|";
 
     let board = BitBoard::read(board_str);
     let start = Instant::now();
-    println!("{:?}", minimax_cached(board, depth, Token::START));
+    minimax_cached(board, depth, Token::START);
     println!("bitboard + cached: {:?}", start.elapsed());
 
     let board = BitBoard::read(board_str);
     let start = Instant::now();
-    println!("{:?}", minimax_symm(board, depth, Token::START));
+    minimax_symm(board, depth, Token::START);
     println!("bitboard + symm: {:?}", start.elapsed());
 
     let board = SymmBoard::read(board_str);
     let start = Instant::now();
-    println!("{:?}", minimax_cached(board, depth, Token::START));
+    minimax_cached(board, depth, Token::START);
     println!("symboard + cached: {:?}", start.elapsed());
 
     let board = SymmBoard::read(board_str);
     let start = Instant::now();
-    println!("{:?}", minimax_symm(board, depth, Token::START));
+    minimax_symm(board, depth, Token::START);
     println!("symmboard + symm: {:?}", start.elapsed());
+
+    let board = BitBoard::read(board_str);
+    let start = Instant::now();
+    minimax_counting(board, depth, Token::START);
+    println!("bitboard + counting: {:?}", start.elapsed());
+
+    let board = SymmBoard::read(board_str);
+    let start = Instant::now();
+    minimax_counting(board, depth, Token::START);
+    println!("symboard + counting: {:?}", start.elapsed());
 }

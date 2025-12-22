@@ -30,9 +30,22 @@ macro_rules! make_medium_tests {
         $(
             make_test_with_board_on_position!($func, $b, MEDIUM_0);
             make_test_with_board_on_position!($func, $b, MEDIUM_1);
+            make_test_with_board_on_position!($func, $b, MEDIUM_2);
+            make_test_with_board_on_position!($func, $b, MEDIUM_3);
         )+
     };
 }
+macro_rules! make_hard_tests {
+    ($func:expr, $($b:ty),+) => {
+        $(
+            make_test_with_board_on_position!($func, $b, HARD_0);
+            make_test_with_board_on_position!($func, $b, HARD_1);
+            make_test_with_board_on_position!($func, $b, HARD_2);
+            //make_test_with_board_on_position!($func, $b, HARD_3);
+        )+
+    };
+}
+
 
 pub fn assert_output<B: Board>(pos: Position, f: impl Fn(B, usize) -> Option<Token>) {
     let board = B::read(pos.board);

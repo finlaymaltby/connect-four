@@ -55,74 +55,67 @@ pub trait Board: Debug + Sized + Eq {
     /// Checks there is a win, a sequence of four same-colour tokens, that includes the given
     /// cell. The winning player is given by the colour of the token at the cell.
     fn won_at(&self, cell: &Cell) -> bool {
-        fn check_line<T: Iterator<Item = Option<Token>>>(line: T, token: &Token) -> bool {
-            let mut count = 0;
-            for cell in line {
-                if cell == Some(*token) {
-                    count += 1;
-                    if count >= 4 {
-                        return true;
-                    }
-                } else {
-                    count = 0;
-                }
-            }
-            false
-        }
-        let Some(token) = self.get(cell) else {
-            return false;
-        };
-
-        // Check horizontal
-        if check_line(cell.row_neighbourhood().map(|cell| self.get(&cell)), &token) {
-            return true;
-        }
-
-        // Check vertical
-        if check_line(cell.col_neighbourhood().map(|cell| self.get(&cell)), &token) {
-            return true;
-        }
-
-        // Check diagonals
-        if check_line(
-            cell.diag1_neighbourhood().map(|cell| self.get(&cell)),
-            &token,
-        ) {
-            return true;
-        }
-        if check_line(
-            cell.diag2_neighbourhood().map(|cell| self.get(&cell)),
-            &token,
-        ) {
-            return true;
-        }
-
-        return false;
+        self.count_adjacent_at(cell).is_none()
     }
 
-    /// For each length of connection
-    /// TODO fix comment
-    fn count_adjacent_at(&self, cell: &Cell) -> Optional<(usize, usize)> {
-        fn count_line(line: &[Cell], token: &Token) -> bool {
-            let mut count = 0;
-            for cell in line {
-                if cell == Some(*token) {
+    /// For every direction (horizontal, vertical, and both diagonals),
+    /// it calculates the length of line of same tokens in that direction,
+    /// including the given cell.
+    /// Returns None if a win is found (a row of four), else
+    /// Some((count of adjacent triples, count of adjacent pairs))
+    fn count_adjacent_at(&self, cell: &Cell) -> Option<(usize, usize)> {
+        fn count_line(board: &impl Board, cell: &Cell, dir: (isize, isize)) -> usize {
+            let Some(token) = board.get(cell) else {
+                panic!("Tried to count adjacent at an empty cell.");
+            };
+
+            let mut next = cell.try_shift(dir);
+            let mut count = 1;
+
+            while let Some(curr) = next {
+                if board.get(&curr) == Some(token) {
                     count += 1;
-                    if count >= 4 {
-                        return true;
+                    if (count >= 4) {
+                        return count;
                     }
                 } else {
-                    count = 0;
+                    break;
                 }
+                next = curr.try_shift(dir);
             }
-            false
+            let dir = (-dir.0, -dir.1);
+            let mut next = cell.try_shift(dir);
+
+            while let Some(curr) = next {
+                if board.get(&curr) == Some(token) {
+                    count += 1;
+                    if (count >= 4) {
+                        return count;
+                    }
+                } else {
+                    break;
+                }
+                next = curr.try_shift(dir);
+            }
+            count
         }
 
         let Some(token) = self.get(cell) else {
-            return false;
+            panic!("Tried to count adjacent at an empty cell")
         };
+        // right, down, to bottom-right, to bottom-left
+        let dirs = [(1, 0), (0, -1), (1, -1), (-1, -1)];
+        let mut counts = (0, 0);
 
-        return [0, 0, 0];
+        for dir in dirs {
+            match count_line(self, cell, dir) {
+                2 => counts.1 += 1,
+                3 => counts.0 += 1,
+                4 => return None,
+                _ => (),
+            }
+        }
+        Some(counts)
     }
     /// String pretty display
     fn to_string(&self) -> String {
@@ -153,6 +146,7 @@ pub trait Board: Debug + Sized + Eq {
     /// Read a board from a string representation.
     fn read(string: &str) -> Self {
         let mut board = Self::EMPTY;
+        let mut diff = 0;
 
         for line in string.split('|').rev() {
             if line.trim().is_empty() {
@@ -162,8 +156,14 @@ pub trait Board: Debug + Sized + Eq {
 
             for (i, ch) in line.chars().enumerate() {
                 let token = match ch {
-                    'R' => Token::Red,
-                    'Y' => Token::Yellow,
+                    'Y' => {
+                        diff += 1;
+                        Token::Yellow
+                    }
+                    'R' => {
+                        diff -= 1;
+                        Token::Red
+                    }
                     '.' | ' ' => continue,
                     '+' | '-' => return board, // end of board representation
                     _ => panic!("Invalid character in board string: {}", ch),
@@ -173,6 +173,7 @@ pub trait Board: Debug + Sized + Eq {
             }
         }
 
+        assert!(diff == 0 || diff == 1, "incorrect difference in yellow and red tokens");
         board
     }
 

@@ -15,7 +15,6 @@ pub fn minimax_cached_helper<B: CloneBoard + Hash>(
     cache: &mut HashMap<B, Option<Token>, RandomState>,
 ) -> Option<Token> {
     if depth == 0 {
-        //cache.insert(board, None);
         return None;
     }
 
@@ -33,16 +32,15 @@ pub fn minimax_cached_helper<B: CloneBoard + Hash>(
             break;
         }
 
-        if let Some(winner) = minimax_cached_helper(next_board, depth - 1, curr.next(), cache) {
-            if winner == curr {
-                out = Some(curr);
+        match minimax_cached_helper(next_board, depth - 1, curr.next(), cache) {
+            None => losing = false,
+            Some(winner) if winner == curr => {
+                out = Some(winner);
                 break;
             }
-        } else {
-            losing = false;
+            _ => (),
         }
     }
-
     if out.is_none() && losing {
         out = Some(curr.next());
     }
@@ -74,6 +72,8 @@ mod tests {
             minimax_cached(b, d, curr)
         },
         SymmBoard,
-        ArrayBoard
+        BitBoard
     );
+
+
 }

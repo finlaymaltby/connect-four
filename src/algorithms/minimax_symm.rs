@@ -123,13 +123,13 @@ fn minimax_symm_helper<B: CloneBoard + Hash>(
             Some(diffs) => minimax_symm_helper(next_board, depth - 1, curr.next(), cache, diffs),
         };
 
-        if let Some(winner) = result {
-            if winner == curr {
+        match result {
+            None => losing = false,
+            Some(winner) if winner == curr => {
                 out = Some(curr);
                 break;
             }
-        } else {
-            losing = false;
+            _ => (),
         }
     }
 
@@ -164,6 +164,6 @@ mod tests {
             minimax_symm(b, d, curr)
         },
         SymmBoard,
-        ArrayBoard
+        BitBoard
     );
 }
