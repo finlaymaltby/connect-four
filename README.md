@@ -1,3 +1,5 @@
+WORK IN PROGRESS
+
 Solving connect four
 
 Todo:
